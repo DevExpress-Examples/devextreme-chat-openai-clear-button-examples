@@ -1,10 +1,6 @@
-.demo-container {
-    display: flex;
-    justify-content: center;
-}
-
-.dx-chat {
-    max-width: 900px;
+body {
+    height: 100vh;
+    margin: 0;
 }
 
 .dx-chat-messagelist-empty-image {
@@ -57,4 +53,9 @@
 .dx-chat-messagebubble-content h6 {
     font-size: revert;
     font-weight: revert;
+}
+
+.chat-disabled .dx-chat-messagebox {
+  opacity: 0.5;
+  pointer-events: none;
 }

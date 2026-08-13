@@ -1,0 +1,20 @@
+.demo-container, .dx-drawer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: calc(100% - 24px);
+    padding: 12px;
+}
+
+.drawer-chat-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+}
+
+#toggle-drawer-button {
+    display: inline-flex;
+}

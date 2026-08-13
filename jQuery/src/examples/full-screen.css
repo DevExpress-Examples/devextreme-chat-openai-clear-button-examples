@@ -1,0 +1,12 @@
+.demo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: calc(100% - 24px);
+    padding: 12px;
+}
+
+.dx-chat, .dx-toolbar {
+    max-width: 900px;
+}
