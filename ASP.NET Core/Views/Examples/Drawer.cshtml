@@ -1,0 +1,117 @@
+@model ASP_NET_Core.Models.ChatViewModel
+
+@(Html.DevExtreme().Drawer()
+    .ID("ai-chat-drawer")
+    .Position(DrawerPosition.Right)
+    .OpenedStateMode(DrawerOpenedStateMode.Shrink)
+    .Template(new TemplateName("DrawerAIChatTemplate"))
+    .Content(@<text>
+        @(Html.DevExtreme().Button()
+            .ID("toggle-drawer-button")
+            .Text("Reveal AI Chat")
+            .Icon("showpanel")
+            .RtlEnabled(true)
+            .OnClick("handleRevealAIChatClick")
+        )
+    </text>)
+)
+
+@using (Html.DevExtreme().NamedTemplate("DrawerAIChatTemplate")) {
+    <div class="drawer-ai-chat-container">
+        @(Html.DevExtreme().Toolbar()
+            .ID("ai-chat-drawer-toolbar")
+            .Width("100%")
+            .Items(i => {
+                i.Add().Location(ToolbarItemLocation.Before).Text("AI Assistant");
+                i.Add().Location(ToolbarItemLocation.After).Widget(w => w.Button()
+                    .ElementAttr("id", "clear-chat-button")
+                    .Icon("clearhistory")
+                    .Hint("Clear Chat")
+                    .Disabled(true)
+                    .OnClick("handleClearChatClick")
+                );
+                i.Add().Location(ToolbarItemLocation.After).Widget(w => w.Button()
+                    .ElementAttr("id", "clear-chat-button")
+                    .Icon("close")
+                    .Hint("Close AI Assistant")
+                    .OnClick("handleCloseAssistantClick")
+                );
+            })
+        )
+
+        @(Html.DevExtreme().Chat()
+            .ID("dx-ai-chat")
+            .User(user => user
+                .Id(Model.CurrentUser.Id)
+            )
+            .DataSource(new JS("dataSource"))
+            .ReloadOnChange(false)
+            .ShowAvatar(false)
+            .ShowDayHeaders(false)
+            .OnMessageEntered("onMessageEntered")
+            .MessageTemplate(new JS("messageTemplate"))
+            .OnInitialized("aiChatInitialized")
+        )
+    </div>
+}
+
+<script>
+    const revealConfig = {
+        text: 'Reveal AI Chat',
+        icon: 'showpanel',
+    }
+
+    const hideConfig = {
+        text: 'Hide AI Chat',
+        icon: 'hidepanel',
+    }
+
+    function handleRevealAIChatClick(e) {
+        const drawer = $('#ai-chat-drawer').dxDrawer('instance');
+
+        drawer.toggle();
+        e.component.option(drawer.option('opened') ? hideConfig : revealConfig)
+    }
+
+    function handleCloseAssistantClick() {
+        $('#ai-chat-drawer').dxDrawer('instance').hide();
+        $('#toggle-drawer-button').dxButton('instance').option(revealConfig);
+        
+    }
+</script>
+
+<style>
+    .demo-container, .dx-drawer-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: calc(100% - 24px);
+        padding: 12px;
+    }
+
+    .drawer-ai-chat-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100%;
+        min-width: 400px;
+        background-color: #fff;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .drawer-ai-chat-container #ai-chat-drawer-toolbar.dx-toolbar {
+        padding: 0 20px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .drawer-ai-chat-container .dx-chat {
+        border: none;
+    }
+
+    #toggle-drawer-button {
+        display: inline-flex;
+    }
+</style>

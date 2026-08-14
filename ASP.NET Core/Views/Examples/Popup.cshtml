@@ -1,0 +1,63 @@
+@model ASP_NET_Core.Models.ChatViewModel
+
+@(Html.DevExtreme().Button()
+    .ID("open-popup-button")
+    .Text("Reveal AI Chat")
+    .Icon("chatsparkleoutline")
+    .OnClick("handleRevealAIChatClick")
+)
+
+@(Html.DevExtreme().Popup()
+    .ID("ai-chat-popup")
+    .WrapperAttr(new { id = "ai-chat-popup-wrapper" })
+    .ToolbarItems(t => {
+        t.Add().Location(ToolbarItemLocation.Before).Text("AI Assistant");
+        t.Add().Location(ToolbarItemLocation.After).Widget(w => w.Button()
+            .ElementAttr("id", "clear-chat-button")
+            .Icon("clearhistory")
+            .Hint("Clear Chat")
+            .Disabled(true)
+            .OnClick("handleClearChatClick")
+        );
+    })
+    .ContentTemplate(@<text>
+        @(Html.DevExtreme().Chat()
+            .ID("dx-ai-chat")
+            .User(user => user
+                .Id(Model.CurrentUser.Id)
+            )
+            .DataSource(new JS("dataSource"))
+            .ReloadOnChange(false)
+            .ShowAvatar(false)
+            .ShowDayHeaders(false)
+            .OnMessageEntered("onMessageEntered")
+            .MessageTemplate(new JS("messageTemplate"))
+            .OnInitialized("aiChatInitialized")
+        )
+    </text>)
+)
+
+<script>
+    function handleRevealAIChatClick() {
+        $('#ai-chat-popup').dxPopup('instance').show();
+    }
+</script>
+
+<style>
+    .demo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: calc(100% - 24px);
+        padding: 12px;
+    }
+
+    #open-popup-button {
+        display: inline-flex;
+    }
+
+    #ai-chat-popup-wrapper .dx-popup-content {
+        padding: 24px;
+    }
+</style>
