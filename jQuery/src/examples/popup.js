@@ -4,7 +4,7 @@ import { user, deployment, endpoint, apiVersion, apiKey, REGENERATION_TEXT } fro
 import { abortCurrentRequest, messageTemplate, customStore, onMessageEntered, clearChat } from './../helpers.js';
 
 $(() => {
-  $('#open-drawer-button').dxButton({
+  $('#open-popup-button').dxButton({
     text: 'Reveal AI Chat',
     icon: 'chatsparkleoutline',
     onClick(e) {
@@ -12,7 +12,8 @@ $(() => {
     },
   })
 
-  const popup = $('#popup').dxPopup({
+  const popup = $('#ai-chat-popup').dxPopup({
+    wrapperAttr: { id: 'ai-chat-popup-wrapper' },
     toolbarItems: [{
       location: 'before',
       text: 'AI Assistant',

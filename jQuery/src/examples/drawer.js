@@ -28,8 +28,9 @@ $(() => {
     position: 'right',
     openedStateMode: 'shrink',
     template(data) {
-      return $('<div>').addClass('drawer-chat-container').append(
+      return $('<div>').addClass('drawer-ai-chat-container').append(
         $('<div>').dxToolbar({
+          elementAttr: { id: 'ai-chat-drawer-toolbar' },
           items: [{
             location: 'before',
             text: 'AI Assistant',
@@ -57,7 +58,7 @@ $(() => {
               onClick() {
                 drawer.hide();
 
-                toggleDrawerButton.option(revealConfig)
+                toggleDrawerButton.option(revealConfig);
               }
             }
           }]
