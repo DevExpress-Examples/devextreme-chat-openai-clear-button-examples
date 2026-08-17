@@ -35,7 +35,7 @@ export class PopupComponent {
   clearButtonOptions: DxButtonTypes.Properties;
 
   popupVisible: boolean = false;
-  popupWrapperAttr = { id: 'ai-chat-popup-wrapper' }
+  popupWrapperAttr = { id: 'ai-chat-popup-wrapper' };
 
   constructor(private readonly appService: AppService) {
     loadMessages(this.appService.getDictionary());

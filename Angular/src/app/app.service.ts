@@ -172,7 +172,7 @@ export class AppService {
     const items = this.dataSource?.items();
     const lastMessage = items?.at(-1);
     const data = {
-      text: text ?? "Regenerating..."
+      text: text ?? this.REGENERATION_TEXT,
     }
     this.dataSource?.store().push([
       {
