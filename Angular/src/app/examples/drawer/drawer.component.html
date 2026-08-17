@@ -13,7 +13,7 @@
       [rtlEnabled]="true"
       (onClick)="handleRevealAIChatClick()"
     ></dx-button>
-    <div *dxTemplate="let data of 'drawerTemplate'" style="height: 100%;">
+    <div *dxTemplate="let data of 'drawerTemplate'" style="height: 100%">
       <div class="drawer-ai-chat-container">
         <dx-toolbar id="ai-chat-drawer-toolbar">
           <dxi-toolbar-item
@@ -46,28 +46,28 @@
         >
           <div *dxTemplate="let data of 'messageTemplate'">
             @if (data.message.text === regenerationText) {
-              <span>{{ regenerationText }}</span>
+            <span>{{ regenerationText }}</span>
             } @else {
-              <div
-                class="dx-chat-messagebubble-text"
-                [innerHTML]="convertToHtml(data.message)"
-              ></div>
-              <div class="dx-bubble-button-container">
-                <dx-button
-                  [icon]="copyButtonIcon"
-                  stylingMode="text"
-                  hint="Copy"
-                  (onClick)="onCopyButtonClick(data.message)"
-                >
-                </dx-button>
-                <dx-button
-                  icon="refresh"
-                  stylingMode="text"
-                  hint="Regenerate"
-                  (onClick)="onRegenerateButtonClick()"
-                >
-                </dx-button>
-              </div>
+            <div
+              class="dx-chat-messagebubble-text"
+              [innerHTML]="convertToHtml(data.message)"
+            ></div>
+            <div class="dx-bubble-button-container">
+              <dx-button
+                [icon]="copyButtonIcon"
+                stylingMode="text"
+                hint="Copy"
+                (onClick)="onCopyButtonClick(data.message)"
+              >
+              </dx-button>
+              <dx-button
+                icon="refresh"
+                stylingMode="text"
+                hint="Regenerate"
+                (onClick)="onRegenerateButtonClick()"
+              >
+              </dx-button>
+            </div>
             }
           </div>
         </dx-chat>

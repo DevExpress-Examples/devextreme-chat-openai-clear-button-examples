@@ -16,10 +16,10 @@
     ></dxi-popup-toolbar-item>
     <dxi-popup-toolbar-item
       location="after"
-        widget="dxButton"
-        [options]="clearButtonOptions"
+      widget="dxButton"
+      [options]="clearButtonOptions"
     ></dxi-popup-toolbar-item>
-    <div *dxTemplate="let data of 'popupTemplate'" style="height: 100%;">
+    <div *dxTemplate="let data of 'popupTemplate'" style="height: 100%">
       <dx-chat
         #aiChat
         [class.chat-disabled]="isDisabled"
@@ -35,28 +35,28 @@
       >
         <div *dxTemplate="let data of 'messageTemplate'">
           @if (data.message.text === regenerationText) {
-            <span>{{ regenerationText }}</span>
+          <span>{{ regenerationText }}</span>
           } @else {
-            <div
-              class="dx-chat-messagebubble-text"
-              [innerHTML]="convertToHtml(data.message)"
-            ></div>
-            <div class="dx-bubble-button-container">
-              <dx-button
-                [icon]="copyButtonIcon"
-                stylingMode="text"
-                hint="Copy"
-                (onClick)="onCopyButtonClick(data.message)"
-              >
-              </dx-button>
-              <dx-button
-                icon="refresh"
-                stylingMode="text"
-                hint="Regenerate"
-                (onClick)="onRegenerateButtonClick()"
-              >
-              </dx-button>
-            </div>
+          <div
+            class="dx-chat-messagebubble-text"
+            [innerHTML]="convertToHtml(data.message)"
+          ></div>
+          <div class="dx-bubble-button-container">
+            <dx-button
+              [icon]="copyButtonIcon"
+              stylingMode="text"
+              hint="Copy"
+              (onClick)="onCopyButtonClick(data.message)"
+            >
+            </dx-button>
+            <dx-button
+              icon="refresh"
+              stylingMode="text"
+              hint="Regenerate"
+              (onClick)="onRegenerateButtonClick()"
+            >
+            </dx-button>
+          </div>
           }
         </div>
       </dx-chat>
