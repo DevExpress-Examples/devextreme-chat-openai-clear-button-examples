@@ -1,27 +1,30 @@
 import { Injectable } from "@angular/core";
 import { Observable, BehaviorSubject } from "rxjs";
-import { OpenAI } from "openai";
+import { AzureOpenAI, APIUserAbortError } from "openai";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
-import { type DxChatTypes } from 'devextreme-angular/ui/chat';
+import { DxChatComponent, type DxChatTypes } from 'devextreme-angular/ui/chat';
 import { DataSource } from 'devextreme-angular/common/data';
 import { CustomStore } from 'devextreme-angular/common/data';
+import { DxButtonTypes } from "devextreme-angular/ui/button";
 
 @Injectable({
   providedIn: "root",
 })
 export class AppService {
-  chatService: OpenAI;
+  chatService: AzureOpenAI;
 
-  OpenAIConfig = {
+  AzureOpenAIConfig = {
     dangerouslyAllowBrowser: true,
-    apiKey: "OPENAI_API_KEY",
-    deployment: "gpt-4o-mini",
+    deployment: 'demo-mini',
+    endpoint: 'https://public-api.devexpress.com/demo-openai',
+    apiVersion: '2024-02-01',
+    apiKey: 'DEMO',
   };
 
-  REGENERATION_TEXT = "Regeneration...";
+  REGENERATION_TEXT = "Regenerating...";
   ALERT_TIMEOUT = 10000;
 
   user: DxChatTypes.User = {
@@ -46,10 +49,20 @@ export class AppService {
   alertsSubject: BehaviorSubject<DxChatTypes.Alert[]> = new BehaviorSubject<DxChatTypes.Alert[]>([]);
 
   constructor() {
-    this.chatService = new OpenAI(this.OpenAIConfig);
+    this.chatService = new AzureOpenAI(this.AzureOpenAIConfig);
     this.initDataSource();
     this.typingUsersSubject.next([]);
     this.alertsSubject.next([]);
+  }
+
+  controller = new AbortController();
+
+  abortCurrentRequest() {
+    this.controller.abort();
+  }
+
+  resetController() {
+    this.controller = new AbortController();
   }
 
   get typingUsers$(): Observable<DxChatTypes.User[]> {
@@ -64,12 +77,12 @@ export class AppService {
     return {
       en: {
         "dxChat-emptyListMessage": "Chat is Empty",
-        "dxChat-emptyListPrompt":
-          "AI Assistant is ready to answer your questions.",
+        "dxChat-emptyListPrompt": "AI Assistant is ready to answer your questions.",
         "dxChat-textareaPlaceholder": "Ask AI Assistant...",
       },
     };
   }
+
   toggleDisabledState(disabled: boolean, event?: { target?: EventTarget } | undefined) {
     const element = event?.target as HTMLElement;
 
@@ -81,6 +94,7 @@ export class AppService {
       }
     }
   }
+
   initDataSource() {
     this.customStore = new CustomStore({
       key: "id",
@@ -113,10 +127,16 @@ export class AppService {
         role: msg.role,
         content: msg.content
       })),
-      model: this.OpenAIConfig.deployment,
+      model: this.AzureOpenAIConfig.deployment,
+      max_completion_tokens: 1000,
+      temperature: 0.7,
     };
 
-    const response = await this.chatService.chat.completions.create(params);
+    const signalObj = {
+      signal: this.controller.signal,
+    };
+
+    const response = await this.chatService.chat.completions.create(params, signalObj);
 
     const data = { choices: response.choices };
 
@@ -131,12 +151,18 @@ export class AppService {
       const aiResponse = await this.getAIResponse(this.messages);
       setTimeout(() => {
         this.typingUsersSubject.next([]);
+
+        if (this.controller.signal.aborted) return;
+
         this.messages.push({ role: "assistant", content: aiResponse ?? "" });
         this.renderAssistantMessage(aiResponse ?? "");
       }, 200);
-    } catch {
+    } catch (error) {
       this.typingUsersSubject.next([]);
-      this.alertLimitReached();
+      
+      if (!(error instanceof APIUserAbortError)) {
+        this.alertLimitReached();
+      }
     } finally {
       this.toggleDisabledState(false, e.event);
     }
@@ -146,7 +172,7 @@ export class AppService {
     const items = this.dataSource?.items();
     const lastMessage = items?.at(-1);
     const data = {
-      text: text ?? "Regeneration..."
+      text: text ?? "Regenerating..."
     }
     this.dataSource?.store().push([
       {
@@ -216,6 +242,8 @@ export class AppService {
   }
 
   async onMessageEntered(event: DxChatTypes.MessageEnteredEvent) {
+    this.resetController();
+
     let { message } = event;
     this.dataSource
       ?.store()
@@ -223,5 +251,22 @@ export class AppService {
 
     this.messages.push({ role: "user", content: message?.text ?? "" });
     await this.processMessageSending(event);
+  }
+
+  clearChat(chatInstance: DxChatComponent) {
+    const removals: any = chatInstance.instance.getDataSource().items().map((item) => ({ type: 'remove', key: item.id }));
+
+    this.store.length = 0;
+    this.messages.length = 0;
+
+    chatInstance.instance.option({ alerts: [], typingUsers: [] });
+
+    chatInstance.instance.getDataSource().store().push(removals);
+  }
+
+  handleClearChatClick = (chatInstance: DxChatComponent) => (e: DxButtonTypes.ClickEvent) => {
+    e.component.option('disabled', true);
+    this.clearChat(chatInstance);
+    this.abortCurrentRequest();
   }
 }

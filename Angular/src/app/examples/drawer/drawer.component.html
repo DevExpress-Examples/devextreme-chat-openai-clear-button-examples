@@ -1,0 +1,77 @@
+<div class="demo-container">
+  <dx-drawer
+    id="ai-chat-drawer"
+    [opened]="drawerOpened"
+    template="drawerTemplate"
+    position="right"
+    openedStateMode="shrink"
+  >
+    <dx-button
+      id="toggle-drawer-button"
+      [text]="toggleDrawerButtonText"
+      [icon]="toggleDrawerButtonIcon"
+      [rtlEnabled]="true"
+      (onClick)="handleRevealAIChatClick()"
+    ></dx-button>
+    <div *dxTemplate="let data of 'drawerTemplate'" style="height: 100%;">
+      <div class="drawer-ai-chat-container">
+        <dx-toolbar id="ai-chat-drawer-toolbar">
+          <dxi-toolbar-item
+            location="before"
+            text="AI Assistant"
+          ></dxi-toolbar-item>
+          <dxi-toolbar-item
+            location="after"
+            widget="dxButton"
+            [options]="clearButtonOptions"
+          ></dxi-toolbar-item>
+          <dxi-toolbar-item
+            location="after"
+            widget="dxButton"
+            [options]="closeDrawerButtonOptions"
+          ></dxi-toolbar-item>
+        </dx-toolbar>
+        <dx-chat
+          #aiChat
+          [class.chat-disabled]="isDisabled"
+          [dataSource]="dataSource"
+          [reloadOnChange]="false"
+          [showAvatar]="false"
+          [showDayHeaders]="false"
+          [user]="user"
+          [typingUsers]="(typingUsers$ | async) || []"
+          [alerts]="(alerts$ | async) || []"
+          (onMessageEntered)="onMessageEntered($event)"
+          messageTemplate="messageTemplate"
+        >
+          <div *dxTemplate="let data of 'messageTemplate'">
+            @if (data.message.text === regenerationText) {
+              <span>{{ regenerationText }}</span>
+            } @else {
+              <div
+                class="dx-chat-messagebubble-text"
+                [innerHTML]="convertToHtml(data.message)"
+              ></div>
+              <div class="dx-bubble-button-container">
+                <dx-button
+                  [icon]="copyButtonIcon"
+                  stylingMode="text"
+                  hint="Copy"
+                  (onClick)="onCopyButtonClick(data.message)"
+                >
+                </dx-button>
+                <dx-button
+                  icon="refresh"
+                  stylingMode="text"
+                  hint="Regenerate"
+                  (onClick)="onRegenerateButtonClick()"
+                >
+                </dx-button>
+              </div>
+            }
+          </div>
+        </dx-chat>
+      </div>
+    </div>
+  </dx-drawer>
+</div>
