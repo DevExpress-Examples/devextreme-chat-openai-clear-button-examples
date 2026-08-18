@@ -15,5 +15,9 @@ export default [
         parser: tsParser,
       },
     },
-  },
+  }, {
+    rules: {
+      'vue/multi-word-component-names': 'off'
+    },
+  }
 ];
