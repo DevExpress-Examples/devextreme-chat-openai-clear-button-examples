@@ -2,8 +2,10 @@ import { type ChatTypes } from 'devextreme-react/chat';
 
 export const OpenAIConfig = {
   dangerouslyAllowBrowser: true,
-  apiKey: 'OPEN_AI_KEY',
-  deployment: 'gpt-4o-mini',
+  deployment: 'demo-mini',
+  endpoint: 'https://public-api.devexpress.com/demo-openai',
+  apiVersion: '2024-02-01',
+  apiKey: 'DEMO',
 };
 
 export const ALERT_TIMEOUT = 10000;

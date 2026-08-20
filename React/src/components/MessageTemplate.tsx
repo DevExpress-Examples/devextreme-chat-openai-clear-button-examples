@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, type JSX } from 'react';
 import Button from 'devextreme-react/button';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
@@ -42,7 +42,7 @@ function MessageTemplate({ text, onRegenerateButtonClick }: MessageProps): JSX.E
       <div className='dx-chat-messagebubble-text'>
         {parsedHtml}
       </div>
-      {text !== 'Regeneration...' && (
+      {text !== 'Regenerating...' && (
         <div className='dx-bubble-button-container'>
           <Button
             icon={icon}
