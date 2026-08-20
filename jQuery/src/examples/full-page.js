@@ -14,7 +14,7 @@ $(() => {
     messageTemplate,
   }).dxChat('instance');
 
-  $('#toolbar').dxToolbar({
+  $('#ai-chat-toolbar').dxToolbar({
     items: [{
       location: 'before',
       text: 'AI Assistant',
