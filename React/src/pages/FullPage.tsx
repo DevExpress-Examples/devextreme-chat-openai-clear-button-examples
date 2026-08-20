@@ -1,14 +1,16 @@
-import { useState, useEffect, useCallback, useRef, type JSX } from 'react';
+import {
+  useState, useEffect, useCallback, useRef, type JSX,
+} from 'react';
 import { loadMessages } from 'devextreme/localization';
 import Chat, { type ChatRef, type ChatTypes } from 'devextreme-react/chat';
-import { AppService } from '../ChatService.tsx';
-import MessageTemplate from '../components/MessageTemplate.tsx';
-import { CHAT_DISABLED_CLASS, user as chatUser } from '../data';
 import { Toolbar, Item } from 'devextreme-react/toolbar';
+import MessageTemplate from '../components/MessageTemplate.tsx';
+import { AppService } from '../ChatService.tsx';
+import { CHAT_DISABLED_CLASS, user as chatUser } from '../data';
 
 export default function FullPageExample(): JSX.Element {
   const chatInstance = useRef<ChatRef>(null);
-  
+
   const appServiceRef = useRef<AppService | null>(null);
   if (appServiceRef.current === null) {
     appServiceRef.current = new AppService(chatInstance);

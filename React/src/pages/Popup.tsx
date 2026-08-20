@@ -1,15 +1,19 @@
-import { useState, useEffect, useCallback, useRef, type JSX } from 'react';
+import {
+  useState, useEffect, useCallback, useRef, type JSX,
+} from 'react';
 import { loadMessages } from 'devextreme/localization';
 import Chat, { type ChatRef, type ChatTypes } from 'devextreme-react/chat';
-import { AppService } from '../ChatService.tsx';
-import MessageTemplate from '../components/MessageTemplate.tsx';
-import { CHAT_DISABLED_CLASS, user as chatUser } from '../data';
 import { Popup, ToolbarItem } from 'devextreme-react/popup';
 import { Button } from 'devextreme-react/button';
+import MessageTemplate from '../components/MessageTemplate.tsx';
+import { AppService } from '../ChatService.tsx';
+import { CHAT_DISABLED_CLASS, user as chatUser } from '../data';
+
+const popupWrapperAttr = { id: 'ai-chat-popup-wrapper' };
 
 export default function PopupExample(): JSX.Element {
   const chatInstance = useRef<ChatRef>(null);
-  
+
   const appServiceRef = useRef<AppService | null>(null);
   if (appServiceRef.current === null) {
     appServiceRef.current = new AppService(chatInstance);
@@ -56,31 +60,27 @@ export default function PopupExample(): JSX.Element {
 
   const handleRevealAIChatClick = useCallback(() => {
     setPopupVisible(true);
-  }, [])
+  }, []);
 
   const handlePopupHiding = useCallback(() => {
     setPopupVisible(false);
-  }, [])
+  }, []);
 
-  const popupWrapperAttr = { id: 'ai-chat-popup-wrapper' };
-
-  const renderPopup = useCallback(() => {
-    return (
-      <Chat
-        ref={chatInstance}
-        className={isDisabled ? CHAT_DISABLED_CLASS : ''}
-        dataSource={appService.dataSource}
-        reloadOnChange={false}
-        showAvatar={false}
-        showDayHeaders={false}
-        user={user}
-        typingUsers={typingUsers}
-        alerts={alerts}
-        onMessageEntered={onMessageEntered}
-        messageRender={messageRender}
-      />
-    );
-  }, [appService, isDisabled, user, typingUsers, alerts, onMessageEntered, messageRender]);
+  const renderPopup = useCallback(() => (
+    <Chat
+      ref={chatInstance}
+      className={isDisabled ? CHAT_DISABLED_CLASS : ''}
+      dataSource={appService.dataSource}
+      reloadOnChange={false}
+      showAvatar={false}
+      showDayHeaders={false}
+      user={user}
+      typingUsers={typingUsers}
+      alerts={alerts}
+      onMessageEntered={onMessageEntered}
+      messageRender={messageRender}
+    />
+  ), [appService, isDisabled, user, typingUsers, alerts, onMessageEntered, messageRender]);
 
   return (
     <div className='popup demo-container'>

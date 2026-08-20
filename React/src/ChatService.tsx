@@ -1,10 +1,10 @@
+import { type RefObject } from 'react';
 import { type ChatRef, type ChatTypes } from 'devextreme-react/chat';
+import { type ButtonTypes } from 'devextreme-react/button';
 import { DataSource, CustomStore } from 'devextreme-react/common/data';
 import { AzureOpenAI, APIUserAbortError } from 'openai';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ALERT_TIMEOUT, assistant, OpenAIConfig } from './data';
-import { type ButtonTypes } from 'devextreme-react/button';
-import type { RefObject } from 'react';
 
 export class AppService {
   chatService: AzureOpenAI;
@@ -42,7 +42,7 @@ export class AppService {
     e.component.option('disabled', true);
     this.clearChat(this.chatInstance);
     this.abortCurrentRequest();
-  }
+  };
 
   clearButtonOptions: ButtonTypes.Properties = {
     icon: 'clearhistory',
@@ -222,7 +222,7 @@ export class AppService {
   }
 
   onMessageEntered(event: ChatTypes.MessageEnteredEvent, setDisabled: (value: boolean) => void): void {
-    this.clearButtonOptions = { ...this.clearButtonOptions, disabled: false, };
+    this.clearButtonOptions = { ...this.clearButtonOptions, disabled: false };
     this.resetController();
 
     let { message } = event;
@@ -234,6 +234,4 @@ export class AppService {
     // eslint-disable-next-line no-void
     void this.processMessageSending(setDisabled, event.event);
   }
-
-  
 }
