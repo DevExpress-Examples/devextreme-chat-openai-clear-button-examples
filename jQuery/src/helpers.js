@@ -84,9 +84,11 @@ export async function regenerate(chatInstance, messages, chatService, customStor
 
     updateLastMessage(aiResponse, chatInstance, customStore);
     messages.at(-1).content = aiResponse;
-  } catch {
+  } catch (error) {
     updateLastMessage(messages.at(-1).content);
-    alertLimitReached();
+    if (!(error instanceof APIUserAbortError)) {
+      alertLimitReached();
+    }
   } finally {
     toggleDisabledState(false, chatInstance);
   }
