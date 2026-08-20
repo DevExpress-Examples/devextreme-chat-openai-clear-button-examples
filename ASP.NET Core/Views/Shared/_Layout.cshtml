@@ -135,9 +135,14 @@
 
                 updateLastMessage(aiResponse);
                 messages.at(-1).content = aiResponse;
-            } catch {
-                updateLastMessage(messages.at(-1).content);
-                alertLimitReached();
+            } catch (error) {
+                const lastMessage = messages.at(-1);
+                if (lastMessage) {
+                    updateLastMessage(lastMessage.content);
+                }
+                if (!(error instanceof APIUserAbortError)) {
+                    alertLimitReached(chatInstance);
+                }
             } finally {
                 toggleDisabledState(false, chatInstance);
             }
