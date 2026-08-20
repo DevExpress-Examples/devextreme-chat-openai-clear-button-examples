@@ -8,7 +8,7 @@ import rehypeStringify from "rehype-stringify";
 import { DxChatComponent, type DxChatTypes } from 'devextreme-angular/ui/chat';
 import { DataSource } from 'devextreme-angular/common/data';
 import { CustomStore } from 'devextreme-angular/common/data';
-import { DxButtonTypes } from "devextreme-angular/ui/button";
+import { type DxButtonTypes } from "devextreme-angular/ui/button";
 
 @Injectable({
   providedIn: "root",
@@ -171,6 +171,8 @@ export class AppService {
   updateLastMessage(text?: string | null | undefined) {
     const items = this.dataSource?.items();
     const lastMessage = items?.at(-1);
+    if (!lastMessage) return;
+
     const data = {
       text: text ?? this.REGENERATION_TEXT,
     }
@@ -218,15 +220,17 @@ export class AppService {
       this.updateLastMessage(aiResponse);
       const lastMsg = this.messages.at(-1);
       if (lastMsg) {
-          lastMsg.content = aiResponse ?? '';
-          this.messages = [...this.messages];
+        lastMsg.content = aiResponse ?? '';
+        this.messages = [...this.messages];
       }
-    } catch {
+    } catch (error) {
       const lastMsg = this.messages.at(-1);
       if (lastMsg) {
         this.updateLastMessage(lastMsg.content);
-    }
-      this.alertLimitReached();
+      }
+      if (!(error instanceof APIUserAbortError)) {
+        this.alertLimitReached();
+      }
     }
   }
 
@@ -244,7 +248,7 @@ export class AppService {
   async onMessageEntered(event: DxChatTypes.MessageEnteredEvent) {
     this.resetController();
 
-    let { message } = event;
+    const { message } = event;
     this.dataSource
       ?.store()
       .push([{ type: "insert", data: { id: Date.now(), ...message } }]);
