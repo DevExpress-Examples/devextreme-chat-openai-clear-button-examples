@@ -162,10 +162,10 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
         lastMsg.content = aiResponse ?? '';
         messages.value = [...messages.value];
       }
-    } catch {
+    } catch (error) {
       const lastMsg = messages.value.at(-1);
       if (lastMsg) updateLastMessage(lastMsg.content);
-      alertLimitReached();
+      if (!(error instanceof APIUserAbortError)) alertLimitReached();
     }
   };
 
