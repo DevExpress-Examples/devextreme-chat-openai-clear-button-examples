@@ -76,7 +76,7 @@ function renderMessage(text, customStore) {
 
   customStore.push([{ type: 'insert', data: message }]);
 }
-export async function regenerate(chatInstance, messages, chatService, customStore) {
+export async function regenerate(chatInstance, messages, customStore, chatService) {
   toggleDisabledState(true, chatInstance);
 
   try {
@@ -85,9 +85,12 @@ export async function regenerate(chatInstance, messages, chatService, customStor
     updateLastMessage(aiResponse, chatInstance, customStore);
     messages.at(-1).content = aiResponse;
   } catch (error) {
-    updateLastMessage(messages.at(-1).content);
+    const lastMessage = messages.at(-1);
+    if (lastMessage) {
+      updateLastMessage(lastMessage.content, chatInstance, customStore);
+    }
     if (!(error instanceof APIUserAbortError)) {
-      alertLimitReached();
+      alertLimitReached(chatInstance);
     }
   } finally {
     toggleDisabledState(false, chatInstance);
@@ -120,9 +123,8 @@ async function getAIResponse(messagesAI, chatService) {
   };
 
   const response = await chatService.chat.completions.create(params, signalObj);
-  const data = { choices: response.choices };
 
-  return data.choices[0].message?.content;
+  return response.choices[0]?.message?.content;
 }
 
 export function convertToHtml(value) {
@@ -220,7 +222,7 @@ export function messageTemplate (data, element) {
       hint: 'Regenerate',
       onClick: () => {
         updateLastMessage('', data.component, customStore);
-        regenerate(data.component, messages, chatService, customStore);
+        regenerate(data.component, messages, customStore, chatService);
       },
     })
     .appendTo($buttonContainer);

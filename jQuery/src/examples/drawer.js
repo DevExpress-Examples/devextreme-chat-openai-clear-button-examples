@@ -1,6 +1,6 @@
 /** OpenAI integration */
 /** doc: https://github.com/openai/openai-node?tab=readme-ov-file#usage */
-import { user, deployment, endpoint, apiVersion, apiKey, REGENERATION_TEXT } from './../data.js';
+import { user } from './../data.js';
 import { abortCurrentRequest, messageTemplate, customStore, onMessageEntered, clearChat } from './../helpers.js';
 
 const revealConfig = {
@@ -27,7 +27,7 @@ $(() => {
   const drawer = $('#drawer').dxDrawer({
     position: 'right',
     openedStateMode: 'shrink',
-    template(data) {
+    template() {
       return $('<div>').addClass('drawer-ai-chat-container').append(
         $('<div>').dxToolbar({
           elementAttr: { id: 'ai-chat-drawer-toolbar' },

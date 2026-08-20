@@ -1,6 +1,6 @@
 /** OpenAI integration */
 /** doc: https://github.com/openai/openai-node?tab=readme-ov-file#usage */
-import { user, deployment, endpoint, apiVersion, apiKey, REGENERATION_TEXT } from './../data.js';
+import { user } from './../data.js';
 import { abortCurrentRequest, messageTemplate, customStore, onMessageEntered, clearChat } from './../helpers.js';
 
 $(() => {
