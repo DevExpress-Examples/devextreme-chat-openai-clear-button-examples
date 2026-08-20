@@ -104,7 +104,7 @@ onMounted(() => {
 });
 
 function handleRevealAIChatClick() {
-  popupVisible.value = !popupVisible.value;
+  popupVisible.value = true;
 }
 </script>
 

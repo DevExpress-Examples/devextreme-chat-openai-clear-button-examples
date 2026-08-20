@@ -88,7 +88,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
       signal: controller.signal,
     };
 
-    const response = await chatService.chat.completions.create(params);
+    const response = await chatService.chat.completions.create(params, signalObj);
     return response.choices[0].message?.content;
   };
 
