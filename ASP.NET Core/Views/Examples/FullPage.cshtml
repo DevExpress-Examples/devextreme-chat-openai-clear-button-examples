@@ -2,7 +2,7 @@
 
 <div class="ai-chat-container">
     @(Html.DevExtreme().Toolbar()
-        .ID("toolbar")
+        .ID("ai-chat-toolbar")
         .Items(i => {
             i.Add().Location(ToolbarItemLocation.Before).Text("AI Assistant");
             i.Add().Location(ToolbarItemLocation.After).Widget(w => w.Button()
@@ -57,7 +57,7 @@
         border: none;
     }
 
-    #toolbar.dx-toolbar {
+    #ai-chat-toolbar.dx-toolbar {
         border-bottom: 1px solid #e0e0e0;
         padding: 0 20px;
     }
