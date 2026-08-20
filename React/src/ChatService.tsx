@@ -212,12 +212,14 @@ export class AppService {
         lastMsg.content = aiResponse ?? '';
         this.messages = [...this.messages];
       }
-    } catch {
+    } catch (error) {
       const lastMsg = this.messages.at(-1);
       if (lastMsg) {
         this.updateLastMessage(lastMsg.content);
       }
-      this.alertLimitReached();
+      if (!(error instanceof APIUserAbortError)) {
+        this.alertLimitReached();
+      }
     }
   }
 
