@@ -63,7 +63,7 @@ import { DxChat } from 'devextreme-vue/chat';
 import { DxButton } from 'devextreme-vue/button';
 import { DxToolbar, DxItem } from 'devextreme-vue/toolbar';
 import { useChatLogic } from '@/helpers/chat.helpers';
-import dxChat from 'devextreme/ui/chat';
+import type dxChat from 'devextreme/ui/chat';
 
 const chatInstance = ref<{ instance: dxChat } | null>(null);
 

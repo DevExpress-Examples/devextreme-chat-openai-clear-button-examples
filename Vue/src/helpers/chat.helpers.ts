@@ -6,9 +6,9 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
 import { loadMessages } from 'devextreme/localization';
-import type { DxChatTypes } from 'devextreme-vue/chat';
-import { DxButtonTypes } from 'devextreme-vue/button';
-import dxChat from 'devextreme/ui/chat';
+import { type DxChatTypes } from 'devextreme-vue/chat';
+import { type DxButtonTypes } from 'devextreme-vue/button';
+import type dxChat from 'devextreme/ui/chat';
 
 const ALERT_TIMEOUT = 10000;
 const AzureOpenAIConfig = {
@@ -29,7 +29,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
   const regenerationText = ref('Regenerating...');
   const copyButtonIcon = ref('copy');
   const isDisabled = ref(false);
-  const store = ref([]);
+  const store = ref<Array<DxChatTypes.Message>>([]);
   const messages = ref<Array<{ role: 'user' | 'assistant' | 'system'; content: string }>>([]);
   const chatService = new AzureOpenAI(AzureOpenAIConfig);
 
@@ -118,10 +118,12 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
   };
 
   const updateLastMessage = (text?: string | null) => {
-    let items = dataSource.value?.items();
+    const items = dataSource.value?.items();
     const lastMessage = items?.at(-1);
+    if (!lastMessage) return;
+
     const data = {
-      text: text ?? regenerationText,
+      text: text ?? regenerationText.value,
     };
 
     dataSource.value?.store().push([{
@@ -147,7 +149,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
     setTimeout(() => setAlerts([]), ALERT_TIMEOUT);
   };
 
-  const setAlerts = (newAlerts: any[]) => {
+  const setAlerts = (newAlerts: Array<DxChatTypes.Alert>) => {
     alerts.value = newAlerts;
   };
 
@@ -193,7 +195,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
     clearButtonOptions.value = { ...clearButtonOptions.value, disabled: false };
     resetController();
 
-    let { message } = e;
+    const { message } = e;
     dataSource.value?.store().push([{
       type: 'insert',
       data: { id: Date.now(), ...message }
@@ -223,7 +225,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
     const widget = chatRef.value?.instance;
     if (!widget) return;
 
-    const removals: any = widget.getDataSource().items().map((item) => ({ type: 'remove', key: item.id }));
+    const removals = widget.getDataSource().items().map((item: DxChatTypes.Message) => ({ type: 'remove' as const, key: item.id }));
 
     store.value.length = 0;
     messages.value.length = 0;
