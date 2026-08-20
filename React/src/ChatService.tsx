@@ -4,7 +4,7 @@ import { type ButtonTypes } from 'devextreme-react/button';
 import { DataSource, CustomStore } from 'devextreme-react/common/data';
 import { AzureOpenAI, APIUserAbortError } from 'openai';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ALERT_TIMEOUT, assistant, OpenAIConfig } from './data';
+import { ALERT_TIMEOUT, assistant, AzureOpenAIConfig } from './data';
 
 export class AppService {
   chatService: AzureOpenAI;
@@ -64,7 +64,7 @@ export class AppService {
   chatInstance: RefObject<ChatRef | null> | undefined;
 
   constructor(chatInstance: RefObject<ChatRef | null> | undefined) {
-    this.chatService = new AzureOpenAI(OpenAIConfig);
+    this.chatService = new AzureOpenAI(AzureOpenAIConfig);
     this.initDataSource();
     this.typingUsersSubject.next([]);
     this.alertsSubject.next([]);
@@ -117,7 +117,9 @@ export class AppService {
         role: msg.role,
         content: msg.content,
       })),
-      model: OpenAIConfig.deployment,
+      model: AzureOpenAIConfig.deployment,
+      max_completion_tokens: 1000,
+      temperature: 0.7,
     };
 
     const signalObj = {

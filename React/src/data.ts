@@ -1,6 +1,6 @@
 import { type ChatTypes } from 'devextreme-react/chat';
 
-export const OpenAIConfig = {
+export const AzureOpenAIConfig = {
   dangerouslyAllowBrowser: true,
   deployment: 'demo-mini',
   endpoint: 'https://public-api.devexpress.com/demo-openai',
