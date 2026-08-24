@@ -1,5 +1,5 @@
 import {
-  user, assistant, CHAT_DISABLED_CLASS, deployment, endpoint, apiVersion, apiKey, REGENERATION_TEXT,
+  user, assistant, CHAT_DISABLED_CLASS, deployment, endpoint, apiVersion, apiKey, REGENERATION_TEXT, clearButtonId,
 } from './data.js';
 
 let chatService;
@@ -173,7 +173,7 @@ export const customStore = new DevExpress.data.CustomStore({
 });
 
 export function onMessageEntered (e) {
-  $('#clear-chat-button').dxButton('instance').option('disabled', false);
+  $(`#${clearButtonId}`).dxButton('instance').option('disabled', false);
   resetController();
 
   const { message } = e;

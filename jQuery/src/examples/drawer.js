@@ -1,6 +1,6 @@
 /** OpenAI integration */
 /** doc: https://github.com/openai/openai-node?tab=readme-ov-file#usage */
-import { user } from './../data.js';
+import { user, clearButtonId } from './../data.js';
 import { abortCurrentRequest, messageTemplate, customStore, onMessageEntered, clearChat } from './../helpers.js';
 
 const revealConfig = {
@@ -38,7 +38,7 @@ $(() => {
             widget: 'dxButton',
             location: 'after',
             options: {
-              elementAttr: { id: 'clear-chat-button'},
+              elementAttr: { id: clearButtonId},
               icon: 'clearhistory',
               hint: 'Clear Chat',
               disabled: true,

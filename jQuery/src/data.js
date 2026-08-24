@@ -4,6 +4,7 @@ export const endpoint = 'https://public-api.devexpress.com/demo-openai';
 export const apiKey = 'DEMO';
 export const REGENERATION_TEXT = 'Regenerating...';
 export const CHAT_DISABLED_CLASS = 'chat-disabled';
+export const clearButtonId = 'clear-chat-button'
 
 export const user = {
   id: 'user',
