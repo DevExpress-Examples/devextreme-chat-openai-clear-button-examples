@@ -142,7 +142,7 @@ export function abortCurrentRequest() {
   controller.abort();
 }
 
-export function resetController() {
+export function resetAbortController() {
   controller = new AbortController();
 }
 
@@ -174,7 +174,7 @@ export const customStore = new DevExpress.data.CustomStore({
 
 export function onMessageEntered (e) {
   $(`#${clearButtonId}`).dxButton('instance').option('disabled', false);
-  resetController();
+  resetAbortController();
 
   const { message } = e;
 
