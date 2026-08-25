@@ -95,7 +95,7 @@
             controller.abort();
         }
 
-        function resetController() {
+        function resetAbortController() {
             controller = new AbortController();
         }
 
@@ -207,7 +207,7 @@
 
         function onMessageEntered({ message, event, component }) {
             $('#@(ChatData.ClearButtonId)').dxButton('instance').option('disabled', false);
-            resetController();
+            resetAbortController();
 
             dataSource.store().push([{ type: "insert", data: { id: Date.now(), ...message } }]);
 
