@@ -46,7 +46,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
     controller.abort();
   }
 
-  function resetController() {
+  function resetAbortController() {
     controller = new AbortController();
   }
 
@@ -193,7 +193,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
 
   const onMessageEntered = async(e: DxChatTypes.MessageEnteredEvent) => {
     clearButtonOptions.value = { ...clearButtonOptions.value, disabled: false };
-    resetController();
+    resetAbortController();
 
     const { message } = e;
     dataSource.value?.store().push([{
