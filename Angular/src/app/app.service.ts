@@ -61,7 +61,7 @@ export class AppService {
     this.controller.abort();
   }
 
-  resetController() {
+  resetAbortController() {
     this.controller = new AbortController();
   }
 
@@ -246,7 +246,7 @@ export class AppService {
   }
 
   async onMessageEntered(event: DxChatTypes.MessageEnteredEvent) {
-    this.resetController();
+    this.resetAbortController();
 
     const { message } = event;
     this.dataSource
