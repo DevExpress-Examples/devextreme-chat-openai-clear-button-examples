@@ -24,7 +24,7 @@
             .Items(i => {
                 i.Add().Location(ToolbarItemLocation.Before).Text("AI Assistant");
                 i.Add().Location(ToolbarItemLocation.After).Widget(w => w.Button()
-                    .ElementAttr("id", "clear-chat-button")
+                    .ElementAttr("id", @ChatData.ClearButtonId)
                     .Icon("clearhistory")
                     .Hint("Clear Chat")
                     .Disabled(true)

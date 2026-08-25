@@ -206,7 +206,7 @@
         }
 
         function onMessageEntered({ message, event, component }) {
-            $('#clear-chat-button').dxButton('instance').option('disabled', false);
+            $('#@(ChatData.ClearButtonId)').dxButton('instance').option('disabled', false);
             resetController();
 
             dataSource.store().push([{ type: "insert", data: { id: Date.now(), ...message } }]);
