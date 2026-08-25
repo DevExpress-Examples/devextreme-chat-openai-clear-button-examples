@@ -57,7 +57,7 @@ export class AppService {
     this.controller.abort();
   }
 
-  resetController(): void {
+  resetAbortController(): void {
     this.controller = new AbortController();
   }
 
@@ -227,7 +227,7 @@ export class AppService {
 
   onMessageEntered(event: ChatTypes.MessageEnteredEvent, setDisabled: (value: boolean) => void): void {
     this.clearButtonOptions = { ...this.clearButtonOptions, disabled: false };
-    this.resetController();
+    this.resetAbortController();
 
     let { message } = event;
     this.dataSource
