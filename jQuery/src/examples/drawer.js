@@ -38,7 +38,7 @@ $(() => {
             widget: 'dxButton',
             location: 'after',
             options: {
-              elementAttr: { id: clearButtonId},
+              elementAttr: { id: clearButtonId },
               icon: 'clearhistory',
               hint: 'Clear Chat',
               disabled: true,
@@ -52,7 +52,7 @@ $(() => {
             widget: 'dxButton',
             location: 'after',
             options: {
-              elementAttr: { id: 'close-drawer-button'},
+              elementAttr: { id: 'close-drawer-button' },
               icon: 'close',
               hint: 'Close AI Assistant',
               onClick() {

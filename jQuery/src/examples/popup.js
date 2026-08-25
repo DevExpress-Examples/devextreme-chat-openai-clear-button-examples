@@ -21,7 +21,7 @@ $(() => {
       widget: 'dxButton',
       location: 'after',
       options: {
-        elementAttr: { id: clearButtonId},
+        elementAttr: { id: clearButtonId },
         icon: 'clearhistory',
         hint: 'Clear Chat',
         disabled: true,
