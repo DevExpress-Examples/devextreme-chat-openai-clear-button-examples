@@ -235,7 +235,7 @@ export class AppService {
       .push([{ type: 'insert', data: { id: Date.now(), ...message } }]);
 
     this.messages.push({ role: 'user', content: message?.text ?? '' });
-    // eslint-disable-next-line no-void
-    void this.processMessageSending(setDisabled, event.event);
+
+    this.processMessageSending(setDisabled, event.event);
   }
 }
