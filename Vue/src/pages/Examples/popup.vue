@@ -7,7 +7,7 @@
       @click="handleRevealAIChatClick"
     />
     <DxPopup
-      :visible="popupVisible"
+      v-model:visible="popupVisible"
       :wrapper-attr="popupWrapperAttr"
       content-template="popupContent"
     >
