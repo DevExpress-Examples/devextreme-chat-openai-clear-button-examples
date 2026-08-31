@@ -1,0 +1,64 @@
+@model ASP_NET_Core.Models.ChatViewModel
+
+<div class="ai-chat-container">
+    @(Html.DevExtreme().Toolbar()
+        .ID("ai-chat-toolbar")
+        .Items(i => {
+            i.Add().Location(ToolbarItemLocation.Before).Text("AI Assistant");
+            i.Add().Location(ToolbarItemLocation.After).Widget(w => w.Button()
+                .ElementAttr("id", @ChatData.ClearButtonId)
+                .Icon("clearhistory")
+                .Hint("Clear Chat")
+                .Disabled(true)
+                .OnClick("handleClearChatClick")
+            );
+        })
+    )
+
+    @(Html.DevExtreme().Chat()
+        .ID("dx-ai-chat")
+        .User(user => user
+            .Id(Model.CurrentUser.Id)
+        )
+        .DataSource(new JS("dataSource"))
+        .ReloadOnChange(false)
+        .ShowAvatar(false)
+        .ShowDayHeaders(false)
+        .OnMessageEntered("onMessageEntered")
+        .MessageTemplate(new JS("messageTemplate"))
+        .OnInitialized("aiChatInitialized")
+    )
+</div>
+
+<style>
+    .demo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: calc(100% - 24px);
+        width: calc(100% - 24px);
+        padding: 12px;
+    }
+
+    .ai-chat-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100%;
+        background-color: #fff;
+        width: 50%;
+        max-width: 900px;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .dx-chat {
+        border: none;
+    }
+
+    #ai-chat-toolbar.dx-toolbar {
+        border-bottom: 1px solid #e0e0e0;
+        padding: 0 20px;
+    }
+</style>
