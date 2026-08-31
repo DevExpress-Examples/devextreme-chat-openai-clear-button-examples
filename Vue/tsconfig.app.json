@@ -3,7 +3,8 @@
   "include": [
     "env.d.ts",
     "src*",
-    "src*.vue"
+    "src*.vue",
+    "./typed-router.d.ts"
   ],
   "exclude": [
     "src__tests__/*"
@@ -16,6 +17,7 @@
         "./src/*"
       ]
     },
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "moduleResolution": "Bundler"
   }
 }

@@ -1,33 +1,54 @@
-import { ref } from 'vue';
-import { OpenAI } from 'openai';
+import { ref, type Ref } from 'vue';
+import { AzureOpenAI, APIUserAbortError } from 'openai';
 import { CustomStore, DataSource } from 'devextreme-vue/common/data';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
 import { loadMessages } from 'devextreme/localization';
-import type { DxChatTypes } from 'devextreme-vue/chat';
+import { type DxChatTypes } from 'devextreme-vue/chat';
+import { type DxButtonTypes } from 'devextreme-vue/button';
+import type dxChat from 'devextreme/ui/chat';
 
 const ALERT_TIMEOUT = 10000;
-const OpenAIConfig = {
+const AzureOpenAIConfig = {
   dangerouslyAllowBrowser: true,
-  apiKey: 'OPEN_AI_KEY',
-  deployment: 'gpt-4o-mini'
+  deployment: 'demo-mini',
+  endpoint: 'https://public-api.devexpress.com/demo-openai',
+  apiVersion: '2024-02-01',
+  apiKey: 'DEMO',
 };
 
 const assistant: DxChatTypes.User = { id: 'assistant', name: 'Virtual Assistant' };
 
-export function useChatLogic() {
+export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
   const dataSource = ref<DataSource | null>(null);
   const user = ref({ id: 'user' });
   const typingUsers = ref<Array<DxChatTypes.User>>([]);
   const alerts = ref<Array<DxChatTypes.Alert>>([]);
-  const regenerationText = ref('Regeneration...');
+  const regenerationText = ref('Regenerating...');
   const copyButtonIcon = ref('copy');
   const isDisabled = ref(false);
-  const store = ref([]);
+  const store = ref<Array<DxChatTypes.Message>>([]);
   const messages = ref<Array<{ role: 'user' | 'assistant' | 'system'; content: string }>>([]);
-  const chatService = new OpenAI(OpenAIConfig);
+  const chatService = new AzureOpenAI(AzureOpenAIConfig);
+
+  const clearButtonOptions = ref<DxButtonTypes.Properties>({
+    icon: 'clearhistory',
+    hint: 'Clear Chat',
+    disabled: true,
+    onClick: handleClearChatClick,
+  })
+
+  let controller = new AbortController();
+
+  function abortCurrentRequest() {
+    controller.abort();
+  }
+
+  function resetAbortController() {
+    controller = new AbortController();
+  }
 
   const loadMessage = () => {
     loadMessages({
@@ -58,10 +79,16 @@ export function useChatLogic() {
         role: msg.role,
         content: msg.content
       })),
-      model: OpenAIConfig.deployment
+      model: AzureOpenAIConfig.deployment,
+      max_completion_tokens: 1000,
+      temperature: 0.7,
     };
 
-    const response = await chatService.chat.completions.create(params);
+    const signalObj = {
+      signal: controller.signal,
+    };
+
+    const response = await chatService.chat.completions.create(params, signalObj);
     return response.choices[0].message?.content;
   };
 
@@ -73,22 +100,30 @@ export function useChatLogic() {
       const aiResponse = await getAIResponse(messages.value);
       setTimeout(() => {
         typingUsers.value = [];
+
+        if (controller.signal.aborted) return;
+
         messages.value.push({ role: 'assistant', content: aiResponse ?? '' });
         renderAssistantMessage(aiResponse ?? '');
       }, 200);
-    } catch {
+    } catch (error) {
       typingUsers.value = [];
-      alertLimitReached();
+
+      if (!(error instanceof APIUserAbortError)) {
+        alertLimitReached();
+      }
     } finally {
       toggleDisabledState(false, e.event);
     }
   };
 
   const updateLastMessage = (text?: string | null) => {
-    let items = dataSource.value?.items();
+    const items = dataSource.value?.items();
     const lastMessage = items?.at(-1);
+    if (!lastMessage) return;
+
     const data = {
-      text: text ?? 'Regeneration...'
+      text: text ?? regenerationText.value,
     };
 
     dataSource.value?.store().push([{
@@ -114,7 +149,7 @@ export function useChatLogic() {
     setTimeout(() => setAlerts([]), ALERT_TIMEOUT);
   };
 
-  const setAlerts = (newAlerts: any[]) => {
+  const setAlerts = (newAlerts: Array<DxChatTypes.Alert>) => {
     alerts.value = newAlerts;
   };
 
@@ -127,10 +162,10 @@ export function useChatLogic() {
         lastMsg.content = aiResponse ?? '';
         messages.value = [...messages.value];
       }
-    } catch {
+    } catch (error) {
       const lastMsg = messages.value.at(-1);
       if (lastMsg) updateLastMessage(lastMsg.content);
-      alertLimitReached();
+      if (!(error instanceof APIUserAbortError)) alertLimitReached();
     }
   };
 
@@ -157,7 +192,10 @@ export function useChatLogic() {
   };
 
   const onMessageEntered = async(e: DxChatTypes.MessageEnteredEvent) => {
-    let { message } = e;
+    clearButtonOptions.value = { ...clearButtonOptions.value, disabled: false };
+    resetAbortController();
+
+    const { message } = e;
     dataSource.value?.store().push([{
       type: 'insert',
       data: { id: Date.now(), ...message }
@@ -183,6 +221,26 @@ export function useChatLogic() {
     }
   };
 
+  function clearChat(chatRef: Ref<{ instance: dxChat } | null>) {
+    const widget = chatRef.value?.instance;
+    if (!widget) return;
+
+    const removals = widget.getDataSource().items().map((item: DxChatTypes.Message) => ({ type: 'remove' as const, key: item.id }));
+
+    store.value.length = 0;
+    messages.value.length = 0;
+
+    widget.option({ alerts: [], typingUsers: [] });
+
+    widget.getDataSource().store().push(removals);
+  }
+
+  function handleClearChatClick(e: DxButtonTypes.ClickEvent) {
+    e.component.option('disabled', true);
+    clearChat(chatInstance);
+    abortCurrentRequest();
+  }
+
   return {
     dataSource,
     user,
@@ -196,6 +254,7 @@ export function useChatLogic() {
     onMessageEntered,
     onCopyButtonClick,
     onRegenerateButtonClick,
-    isDisabled
+    isDisabled,
+    clearButtonOptions
   };
 }
