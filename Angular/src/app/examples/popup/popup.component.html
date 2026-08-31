@@ -1,0 +1,65 @@
+<div class="demo-container">
+  <dx-button
+    id="open-popup-button"
+    text="Reveal AI Chat"
+    icon="chatsparkleoutline"
+    (onClick)="handleRevealAIChatClick()"
+  ></dx-button>
+  <dx-popup
+    contentTemplate="popupTemplate"
+    [(visible)]="popupVisible"
+    [wrapperAttr]="popupWrapperAttr"
+  >
+    <dxi-popup-toolbar-item
+      location="before"
+      text="AI Assistant"
+    ></dxi-popup-toolbar-item>
+    <dxi-popup-toolbar-item
+      location="after"
+      widget="dxButton"
+      [options]="clearButtonOptions"
+    ></dxi-popup-toolbar-item>
+    <div *dxTemplate="let data of 'popupTemplate'" style="height: 100%">
+      <dx-chat
+        #aiChat
+        [class.chat-disabled]="isDisabled"
+        [dataSource]="dataSource"
+        [reloadOnChange]="false"
+        [showAvatar]="false"
+        [showDayHeaders]="false"
+        [user]="user"
+        [typingUsers]="(typingUsers$ | async) || []"
+        [alerts]="(alerts$ | async) || []"
+        (onMessageEntered)="onMessageEntered($event)"
+        messageTemplate="messageTemplate"
+      >
+        <div *dxTemplate="let data of 'messageTemplate'">
+          @if (data.message.text === regenerationText) {
+          <span>{{ regenerationText }}</span>
+          } @else {
+          <div
+            class="dx-chat-messagebubble-text"
+            [innerHTML]="convertToHtml(data.message)"
+          ></div>
+          <div class="dx-bubble-button-container">
+            <dx-button
+              [icon]="copyButtonIcon"
+              stylingMode="text"
+              hint="Copy"
+              (onClick)="onCopyButtonClick(data.message)"
+            >
+            </dx-button>
+            <dx-button
+              icon="refresh"
+              stylingMode="text"
+              hint="Regenerate"
+              (onClick)="onRegenerateButtonClick()"
+            >
+            </dx-button>
+          </div>
+          }
+        </div>
+      </dx-chat>
+    </div>
+  </dx-popup>
+</div>
