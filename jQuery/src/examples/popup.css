@@ -1,0 +1,16 @@
+.demo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: calc(100% - 24px);
+    padding: 12px;
+}
+
+#open-popup-button {
+    display: inline-flex;
+}
+
+#ai-chat-popup-wrapper .dx-popup-content {
+    padding: 24px;
+}

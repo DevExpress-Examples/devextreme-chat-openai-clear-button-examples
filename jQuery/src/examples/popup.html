@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DevExtreme jQuery app</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../../node_modules/devextreme-dist/css/dx.fluent.blue.light.css" />
+    <link rel="stylesheet" type="text/css" href="../shared.css" />
+    <link rel="stylesheet" type="text/css" href="popup.css" />
+    <script type="text/javascript" src="../../node_modules/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="../../node_modules/devextreme-dist/js/dx.all.js"></script>
+    <script type="text/javascript" src="../devextreme-license.js"></script>
+    <script type="module" src="../helpers.js"></script>
+    <script type="module" src="popup.js"></script>
+
+    <script type="module">
+      import { AzureOpenAI, APIUserAbortError } from "https://esm.sh/openai@4.73.1";
+      import { unified } from "https://esm.sh/unified@11?bundle";
+      import remarkParse from "https://esm.sh/remark-parse@11?bundle";
+      import remarkRehype from "https://esm.sh/remark-rehype@11?bundle";
+      import rehypeStringify from "https://esm.sh/rehype-stringify@10?bundle";
+      import rehypeMinifyWhitespace from "https://esm.sh/rehype-minify-whitespace@6?bundle";
+
+      window.AzureOpenAI = AzureOpenAI;
+      window.APIUserAbortError = APIUserAbortError;
+      window.unified = unified;
+      window.remarkParse = remarkParse;
+      window.remarkRehype = remarkRehype;
+      window.rehypeMinifyWhitespace = rehypeMinifyWhitespace;
+      window.rehypeStringify = rehypeStringify;
+    </script>
+  </head>
+
+  <body class="dx-viewport">
+    <div class="demo-container">
+      <div id="open-popup-button"></div>
+      <div id="ai-chat-popup"></div>
+    </div>
+  </body>
+</html>

@@ -6,34 +6,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <link rel="icon" href="/favicon.ico" />
-    <link rel="stylesheet" type="text/css" href="../node_modules/devextreme-dist/css/dx.material.blue.light.compact.css" />
-    <link rel="stylesheet" type="text/css" href="index.css" />
+    <link rel="stylesheet" type="text/css" href="../node_modules/devextreme-dist/css/dx.fluent.blue.light.css" />
     <script type="text/javascript" src="../node_modules/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="../node_modules/devextreme-dist/js/dx.all.js"></script>
     <script type="text/javascript" src="./devextreme-license.js"></script>
-    <script type="module" src="helpers.js"></script>
-    <script type="module" src="index.js"></script>
 
-    <script type="module">
-      import OpenAI from "https://esm.sh/openai@4.73.1";
-      import { unified } from "https://esm.sh/unified@11?bundle";
-      import remarkParse from "https://esm.sh/remark-parse@11?bundle";
-      import remarkRehype from "https://esm.sh/remark-rehype@11?bundle";
-      import rehypeStringify from "https://esm.sh/rehype-stringify@10?bundle";
-      import rehypeMinifyWhitespace from "https://esm.sh/rehype-minify-whitespace@6?bundle";
+    <style>
+      .demo-container {
+        padding: 12px;
+      }
 
-      window.OpenAI = OpenAI;
-      window.unified = unified;
-      window.remarkParse = remarkParse;
-      window.remarkRehype = remarkRehype;
-      window.rehypeMinifyWhitespace = rehypeMinifyWhitespace;
-      window.rehypeStringify = rehypeStringify;
-    </script>
+      a {
+        padding: 4px;
+      }
+    </style>
   </head>
 
   <body class="dx-viewport">
     <div class="demo-container">
-      <div id="dx-ai-chat"></div>
+      <a href="/src/examples/full-page.html">Full-Page</a>
+      <a href="/src/examples/drawer.html">Drawer</a>
+      <a href="/src/examples/popup.html">Popup</a>
     </div>
   </body>
 </html>
