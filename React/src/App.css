@@ -1,11 +1,109 @@
-.demo-container {
-  display: flex;
-  justify-content: center;
+.main {
+  padding: 12px;
 }
 
-.dx-chat {
-  max-width: 900px;
+.main a {
+  padding: 4px;
 }
+
+#root {
+  height: 100vh;
+}
+
+/* #region full-page */
+
+.full-page.demo-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: calc(100% - 24px);
+  width: calc(100% - 24px);
+  padding: 12px;
+}
+
+.full-page .ai-chat-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+  background-color: #fff;
+  width: 50%;
+  max-width: 900px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.full-page .ai-chat-container .dx-chat {
+  border: none;
+}
+
+.full-page #ai-chat-toolbar.dx-toolbar {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0 20px;
+}
+
+/* #endregion */
+
+/* #region drawer */
+
+.drawer.demo-container, .drawer .dx-drawer-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: calc(100% - 24px);
+  padding: 12px;
+}
+
+.drawer .drawer-ai-chat-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+  min-width: 400px;
+  background-color: #fff;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.drawer .drawer-ai-chat-container #ai-chat-drawer-toolbar.dx-toolbar {
+  padding: 0 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.drawer .drawer-ai-chat-container .dx-chat {
+  border: none;
+}
+
+.drawer #toggle-drawer-button {
+  display: inline-flex;
+}
+
+/* #endregion */
+
+/* #region Popup */
+
+.popup.demo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: calc(100% - 24px);
+  padding: 12px;
+}
+
+.popup #open-popup-button {
+  display: inline-flex;
+}
+
+#ai-chat-popup-wrapper .dx-popup-content {
+  padding: 24px;
+}
+
+/* #endregion */
 
 .dx-chat-messagelist-empty-image {
   display: none;

@@ -1,11 +1,13 @@
-import { type ChatTypes } from 'devextreme-react/chat';
+import { type RefObject } from 'react';
+import { type ChatRef, type ChatTypes } from 'devextreme-react/chat';
+import { type ButtonTypes } from 'devextreme-react/button';
 import { DataSource, CustomStore } from 'devextreme-react/common/data';
-import { OpenAI } from 'openai';
+import { AzureOpenAI, APIUserAbortError } from 'openai';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ALERT_TIMEOUT, assistant, OpenAIConfig } from './data';
+import { ALERT_TIMEOUT, assistant, AzureOpenAIConfig } from './data';
 
-class AppService {
-  chatService: OpenAI;
+export class AppService {
+  chatService: AzureOpenAI;
 
   store: ChatTypes.Message[] = [];
 
@@ -21,11 +23,52 @@ class AppService {
 
   private readonly alertsSubject: BehaviorSubject<ChatTypes.Alert[]> = new BehaviorSubject<ChatTypes.Alert[]>([]);
 
-  constructor() {
-    this.chatService = new OpenAI(OpenAIConfig);
+  clearChat(chatRef: RefObject<ChatRef | null> | undefined): void {
+    const widget = chatRef?.current?.instance();
+    if (!widget) return;
+
+    const removals: any = widget.getDataSource().items().map((item: any) => ({ type: 'remove', key: item.id }));
+
+    this.store.length = 0;
+    this.messages.length = 0;
+
+    this.typingUsersSubject.next([]);
+    this.setAlerts([]);
+
+    widget.getDataSource().store().push(removals);
+  }
+
+  handleClearChatClick = (e: ButtonTypes.ClickEvent): void => {
+    e.component.option('disabled', true);
+    this.clearChat(this.chatInstance);
+    this.abortCurrentRequest();
+  };
+
+  clearButtonOptions: ButtonTypes.Properties = {
+    icon: 'clearhistory',
+    hint: 'Clear Chat',
+    disabled: true,
+    onClick: this.handleClearChatClick,
+  };
+
+  controller = new AbortController();
+
+  abortCurrentRequest(): void {
+    this.controller.abort();
+  }
+
+  resetAbortController(): void {
+    this.controller = new AbortController();
+  }
+
+  chatInstance: RefObject<ChatRef | null> | undefined;
+
+  constructor(chatInstance: RefObject<ChatRef | null> | undefined) {
+    this.chatService = new AzureOpenAI(AzureOpenAIConfig);
     this.initDataSource();
     this.typingUsersSubject.next([]);
     this.alertsSubject.next([]);
+    this.chatInstance = chatInstance;
   }
 
   get typingUsers$(): Observable<ChatTypes.User[]> {
@@ -74,10 +117,16 @@ class AppService {
         role: msg.role,
         content: msg.content,
       })),
-      model: OpenAIConfig.deployment,
+      model: AzureOpenAIConfig.deployment,
+      max_completion_tokens: 1000,
+      temperature: 0.7,
     };
 
-    const response = await this.chatService.chat.completions.create(params);
+    const signalObj = {
+      signal: this.controller.signal,
+    };
+
+    const response = await this.chatService.chat.completions.create(params, signalObj);
     const data = { choices: response.choices };
     return data.choices[0].message?.content;
   }
@@ -91,13 +140,19 @@ class AppService {
       const aiResponse = await this.getAIResponse(this.messages);
       setTimeout(() => {
         this.typingUsersSubject.next([]);
+
+        if (this.controller.signal.aborted) return;
+
         this.messages.push({ role: 'assistant', content: aiResponse ?? '' });
         this.renderAssistantMessage(aiResponse ?? '');
       }, 200);
-    } catch {
+    } catch (error) {
       (event?.target as HTMLElement).focus();
       this.typingUsersSubject.next([]);
-      this.alertLimitReached();
+
+      if (!(error instanceof APIUserAbortError)) {
+        this.alertLimitReached();
+      }
     } finally {
       (event?.target as HTMLElement).focus();
       setDisabled(false);
@@ -107,8 +162,10 @@ class AppService {
   updateLastMessage(text?: string | null | undefined): void {
     const items = this.dataSource?.items();
     const lastMessage = items?.at(-1);
+    if (!lastMessage) return;
+
     const data = {
-      text: text ?? 'Regeneration...',
+      text: text ?? 'Regenerating...',
     };
 
     this.dataSource?.store().push([{ type: 'remove', key: lastMessage.id }]);
@@ -157,25 +214,28 @@ class AppService {
         lastMsg.content = aiResponse ?? '';
         this.messages = [...this.messages];
       }
-    } catch {
+    } catch (error) {
       const lastMsg = this.messages.at(-1);
       if (lastMsg) {
         this.updateLastMessage(lastMsg.content);
       }
-      this.alertLimitReached();
+      if (!(error instanceof APIUserAbortError)) {
+        this.alertLimitReached();
+      }
     }
   }
 
-  onMessageEntered(event: ChatTypes.MessageEnteredEvent, setDisabled: Function): void {
+  onMessageEntered(event: ChatTypes.MessageEnteredEvent, setDisabled: (value: boolean) => void): void {
+    this.clearButtonOptions = { ...this.clearButtonOptions, disabled: false };
+    this.resetAbortController();
+
     let { message } = event;
     this.dataSource
       ?.store()
       .push([{ type: 'insert', data: { id: Date.now(), ...message } }]);
 
     this.messages.push({ role: 'user', content: message?.text ?? '' });
-    // eslint-disable-next-line no-void
-    void this.processMessageSending(setDisabled, event.event);
+
+    this.processMessageSending(setDisabled, event.event);
   }
 }
-
-export const appService = new AppService();
