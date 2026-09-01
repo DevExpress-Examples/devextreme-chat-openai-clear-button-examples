@@ -107,11 +107,11 @@ onMounted(() => {
     align-items: center;
     flex-direction: column;
     height: 100%;
-    background-color: #fff;
+    background-color: var(--dx-component-color-bg);
     width: 50%;
     max-width: 900px;
     border-radius: 12px;
-    border: 1px solid #e0e0e0;
+    border: var(--dx-border-width) solid var(--dx-color-border);
 }
 
 .dx-chat {
@@ -119,7 +119,7 @@ onMounted(() => {
 }
 
 #ai-chat-toolbar.dx-toolbar {
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: var(--dx-border-width) solid var(--dx-color-border);
     padding: 0 20px;
 }
 </style>
