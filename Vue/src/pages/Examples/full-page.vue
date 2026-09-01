@@ -109,6 +109,7 @@ onMounted(() => {
     height: 100%;
     background-color: var(--dx-component-color-bg);
     width: 50%;
+    min-width: 22.45em;
     max-width: 900px;
     border-radius: 12px;
     border: var(--dx-border-width) solid var(--dx-color-border);
