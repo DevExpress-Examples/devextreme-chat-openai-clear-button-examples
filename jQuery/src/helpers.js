@@ -146,8 +146,8 @@ export function resetAbortController() {
   controller = new AbortController();
 }
 
-export const messageStore = [];
-export const messages = [];
+export const chatMessages = [];
+export const aiMessages = [];
 
 export const customStore = new DevExpress.data.CustomStore({
   key: 'id',
@@ -155,7 +155,7 @@ export const customStore = new DevExpress.data.CustomStore({
     const d = $.Deferred();
 
     setTimeout(() => {
-      d.resolve([...messageStore]);
+      d.resolve([...chatMessages]);
     });
 
     return d.promise();
@@ -164,7 +164,7 @@ export const customStore = new DevExpress.data.CustomStore({
     const d = $.Deferred();
 
     setTimeout(() => {
-      messageStore.push(message);
+      chatMessages.push(message);
       d.resolve();
     });
 
@@ -179,9 +179,9 @@ export function onMessageEntered (e) {
   const { message } = e;
 
   customStore.push([{ type: 'insert', data: { id: Date.now(), ...message } }]);
-  messages.push({ role: 'user', content: message.text });
+  aiMessages.push({ role: 'user', content: message.text });
 
-  processMessageSending(e.component, messages, customStore, chatService);
+  processMessageSending(e.component, aiMessages, customStore, chatService);
 }
 
 export function messageTemplate (data, element) {
@@ -222,7 +222,7 @@ export function messageTemplate (data, element) {
       hint: 'Regenerate',
       onClick: () => {
         updateLastMessage('', data.component, customStore);
-        regenerate(data.component, messages, customStore, chatService);
+        regenerate(data.component, aiMessages, customStore, chatService);
       },
     })
     .appendTo($buttonContainer);
@@ -233,8 +233,8 @@ export function messageTemplate (data, element) {
 export function clearChat(chatInstance) {
   const removals = chatInstance.getDataSource().items().map((item) => ({ type: 'remove', key: item.id }));
 
-  messageStore.length = 0;
-  messages.length = 0;
+  chatMessages.length = 0;
+  aiMessages.length = 0;
 
   chatInstance.option({ alerts: [], typingUsers: [] });
 
