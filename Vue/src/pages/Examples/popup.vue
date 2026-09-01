@@ -24,6 +24,7 @@
         <div>
           <DxChat
             ref="chatInstance"
+            id="dx-ai-chat"
             :class="isDisabled ? 'chat-disabled' : ''"
             :data-source="dataSource"
             :reload-on-change="false"
