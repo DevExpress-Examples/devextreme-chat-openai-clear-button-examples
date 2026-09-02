@@ -44,6 +44,5 @@ $(() => {
         messageTemplate,
       });
     },
-    width: 900,
   }).dxPopup('instance');
 });
