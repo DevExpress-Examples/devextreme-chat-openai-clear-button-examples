@@ -29,8 +29,8 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
   const regenerationText = ref('Regenerating...');
   const copyButtonIcon = ref('copy');
   const isDisabled = ref(false);
-  const store = ref<Array<DxChatTypes.Message>>([]);
-  const messages = ref<Array<{ role: 'user' | 'assistant' | 'system'; content: string }>>([]);
+  const chatMessages = ref<Array<DxChatTypes.Message>>([]);
+  const aiMessages = ref<Array<{ role: 'user' | 'assistant' | 'system'; content: string }>>([]);
   const chatService = new AzureOpenAI(AzureOpenAIConfig);
 
   const clearButtonOptions = ref<DxButtonTypes.Properties>({
@@ -63,9 +63,9 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
   const initDataSource = () => {
     const customStore = new CustomStore({
       key: 'id',
-      load: () => Promise.resolve([...store.value]),
+      load: () => Promise.resolve([...chatMessages.value]),
       insert: (message) => {
-        store.value.push(message);
+        chatMessages.value.push(message);
         return Promise.resolve(message);
       }
     });
@@ -97,13 +97,13 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
     typingUsers.value = [assistant];
 
     try {
-      const aiResponse = await getAIResponse(messages.value);
+      const aiResponse = await getAIResponse(aiMessages.value);
       setTimeout(() => {
         typingUsers.value = [];
 
         if (controller.signal.aborted) return;
 
-        messages.value.push({ role: 'assistant', content: aiResponse ?? '' });
+        aiMessages.value.push({ role: 'assistant', content: aiResponse ?? '' });
         renderAssistantMessage(aiResponse ?? '');
       }, 200);
     } catch (error) {
@@ -155,15 +155,15 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
 
   const regenerate = async() => {
     try {
-      const aiResponse = await getAIResponse(messages.value.slice(0, -1));
+      const aiResponse = await getAIResponse(aiMessages.value.slice(0, -1));
       updateLastMessage(aiResponse);
-      const lastMsg = messages.value.at(-1);
+      const lastMsg = aiMessages.value.at(-1);
       if (lastMsg) {
         lastMsg.content = aiResponse ?? '';
-        messages.value = [...messages.value];
+        aiMessages.value = [...aiMessages.value];
       }
     } catch (error) {
-      const lastMsg = messages.value.at(-1);
+      const lastMsg = aiMessages.value.at(-1);
       if (lastMsg) updateLastMessage(lastMsg.content);
       if (!(error instanceof APIUserAbortError)) alertLimitReached();
     }
@@ -201,7 +201,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
       data: { id: Date.now(), ...message }
     }]);
 
-    messages.value.push({ role: 'user', content: message?.text ?? '' });
+    aiMessages.value.push({ role: 'user', content: message?.text ?? '' });
     await processMessageSending(e);
   };
 
@@ -227,8 +227,8 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
 
     const removals = widget.getDataSource().items().map((item: DxChatTypes.Message) => ({ type: 'remove' as const, key: item.id }));
 
-    store.value.length = 0;
-    messages.value.length = 0;
+    chatMessages.value.length = 0;
+    aiMessages.value.length = 0;
 
     widget.option({ alerts: [], typingUsers: [] });
 

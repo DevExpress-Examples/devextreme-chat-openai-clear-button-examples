@@ -51,8 +51,8 @@
         let instance;
         let chatService;
 
-        let store = [];
-        let messages = [];
+        let chatMessages = [];
+        let aiMessages = [];
 
         function aiChatInitialized({ component }) {
             instance = component;
@@ -131,12 +131,12 @@
             toggleDisabledState(true, chatInstance);
 
             try {
-                const aiResponse = await getAIResponse(messages.slice(0, -1));
+                const aiResponse = await getAIResponse(aiMessages.slice(0, -1));
 
                 updateLastMessage(aiResponse);
-                messages.at(-1).content = aiResponse;
+                aiMessages.at(-1).content = aiResponse;
             } catch (error) {
-                const lastMessage = messages.at(-1);
+                const lastMessage = aiMessages.at(-1);
                 if (lastMessage) {
                     updateLastMessage(lastMessage.content);
                 }
@@ -180,18 +180,18 @@
         async function processMessageSending(chatInstance, message, event) {
             toggleDisabledState(true, chatInstance);
 
-            messages.push({ role: "user", content: message.text });
+            aiMessages.push({ role: "user", content: message.text });
             chatInstance.option({ typingUsers: [assistant] });
 
             try {
-                const aiResponse = await getAIResponse(messages);
+                const aiResponse = await getAIResponse(aiMessages);
 
                 setTimeout(() => {
                     chatInstance.option({ typingUsers: [] });
 
                     if (controller.signal.aborted) return;
 
-                    messages.push({ role: "assistant", content: aiResponse });
+                    aiMessages.push({ role: "assistant", content: aiResponse });
                     renderAssistantMessage(aiResponse);
                 }, 200);
             } catch (error) {
@@ -233,7 +233,7 @@
                 const d = $.Deferred();
 
                 setTimeout(() => {
-                    d.resolve([...store]);
+                    d.resolve([...chatMessages]);
                 });
 
                 return d.promise();
@@ -242,7 +242,7 @@
                 const d = $.Deferred();
 
                 setTimeout(() => {
-                    store.push(message);
+                    chatMessages.push(message);
                     d.resolve();
                 });
 
@@ -316,8 +316,8 @@
         function clearChat(chatInstance) {
             const removals = chatInstance.getDataSource().items().map((item) => ({ type: 'remove', key: item.id }));
 
-            store.length = 0;
-            messages.length = 0;
+            chatMessages.length = 0;
+            aiMessages.length = 0;
 
             chatInstance.option({ alerts: [], typingUsers: [] });
 

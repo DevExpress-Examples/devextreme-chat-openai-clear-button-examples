@@ -36,8 +36,8 @@ export class AppService {
     name: "Virtual Assistant",
   };
 
-  store: Array<{ id: number; timestamp: Date; author: DxChatTypes.User; text: string }> = [];
-  messages: Array<{ role: "user" | "assistant" | "system"; content: string }> = [];
+  chatMessages: Array<{ id: number; timestamp: Date; author: DxChatTypes.User; text: string }> = [];
+  aiMessages: Array<{ role: "user" | "assistant" | "system"; content: string }> = [];
   alerts: DxChatTypes.Alert[] = [];
 
   customStore: CustomStore | undefined;
@@ -101,14 +101,14 @@ export class AppService {
       load: () => {
         return new Promise((resolve) => {
           setTimeout(() => {
-            resolve([...this.store]);
+            resolve([...this.chatMessages]);
           }, 0);
         });
       },
       insert: (message) => {
         return new Promise((resolve) => {
           setTimeout(() => {
-            this.store.push(message);
+            this.chatMessages.push(message);
             resolve(message);
           });
         });
@@ -148,13 +148,13 @@ export class AppService {
 
     this.typingUsersSubject.next([this.assistant]);
     try {
-      const aiResponse = await this.getAIResponse(this.messages);
+      const aiResponse = await this.getAIResponse(this.aiMessages);
       setTimeout(() => {
         this.typingUsersSubject.next([]);
 
         if (this.controller.signal.aborted) return;
 
-        this.messages.push({ role: "assistant", content: aiResponse ?? "" });
+        this.aiMessages.push({ role: "assistant", content: aiResponse ?? "" });
         this.renderAssistantMessage(aiResponse ?? "");
       }, 200);
     } catch (error) {
@@ -215,16 +215,16 @@ export class AppService {
 
   async regenerate() {
     try {
-      const aiResponse = await this.getAIResponse(this.messages.slice(0, -1));
+      const aiResponse = await this.getAIResponse(this.aiMessages.slice(0, -1));
 
       this.updateLastMessage(aiResponse);
-      const lastMsg = this.messages.at(-1);
+      const lastMsg = this.aiMessages.at(-1);
       if (lastMsg) {
         lastMsg.content = aiResponse ?? '';
-        this.messages = [...this.messages];
+        this.aiMessages = [...this.aiMessages];
       }
     } catch (error) {
-      const lastMsg = this.messages.at(-1);
+      const lastMsg = this.aiMessages.at(-1);
       if (lastMsg) {
         this.updateLastMessage(lastMsg.content);
       }
@@ -253,15 +253,15 @@ export class AppService {
       ?.store()
       .push([{ type: "insert", data: { id: Date.now(), ...message } }]);
 
-    this.messages.push({ role: "user", content: message?.text ?? "" });
+    this.aiMessages.push({ role: "user", content: message?.text ?? "" });
     await this.processMessageSending(event);
   }
 
   clearChat(chatInstance: DxChatComponent) {
     const removals: any = chatInstance.instance.getDataSource().items().map((item) => ({ type: 'remove', key: item.id }));
 
-    this.store.length = 0;
-    this.messages.length = 0;
+    this.chatMessages.length = 0;
+    this.aiMessages.length = 0;
 
     chatInstance.instance.option({ alerts: [], typingUsers: [] });
 

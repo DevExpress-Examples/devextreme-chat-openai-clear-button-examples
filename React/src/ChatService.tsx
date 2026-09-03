@@ -9,9 +9,9 @@ import { ALERT_TIMEOUT, assistant, AzureOpenAIConfig } from './data';
 export class AppService {
   chatService: AzureOpenAI;
 
-  store: ChatTypes.Message[] = [];
+  chatMessages: ChatTypes.Message[] = [];
 
-  messages: { role: 'user' | 'assistant' | 'system'; content: string }[] = [];
+  aiMessages: { role: 'user' | 'assistant' | 'system'; content: string }[] = [];
 
   alerts: ChatTypes.Alert[] = [];
 
@@ -29,8 +29,8 @@ export class AppService {
 
     const removals: any = widget.getDataSource().items().map((item: any) => ({ type: 'remove', key: item.id }));
 
-    this.store.length = 0;
-    this.messages.length = 0;
+    this.chatMessages.length = 0;
+    this.aiMessages.length = 0;
 
     this.typingUsersSubject.next([]);
     this.setAlerts([]);
@@ -94,12 +94,12 @@ export class AppService {
       key: 'id',
       load: () => new Promise((resolve): void => {
         setTimeout(() => {
-          resolve([...this.store]);
+          resolve([...this.chatMessages]);
         }, 0);
       }),
       insert: (message: ChatTypes.Message) => new Promise((resolve): void => {
         setTimeout(() => {
-          this.store.push(message);
+          this.chatMessages.push(message);
           resolve(message);
         });
       }),
@@ -137,13 +137,13 @@ export class AppService {
     this.typingUsersSubject.next([assistant]);
 
     try {
-      const aiResponse = await this.getAIResponse(this.messages);
+      const aiResponse = await this.getAIResponse(this.aiMessages);
       setTimeout(() => {
         this.typingUsersSubject.next([]);
 
         if (this.controller.signal.aborted) return;
 
-        this.messages.push({ role: 'assistant', content: aiResponse ?? '' });
+        this.aiMessages.push({ role: 'assistant', content: aiResponse ?? '' });
         this.renderAssistantMessage(aiResponse ?? '');
       }, 200);
     } catch (error) {
@@ -207,15 +207,15 @@ export class AppService {
 
   async regenerate(): Promise<void> {
     try {
-      const aiResponse = await this.getAIResponse(this.messages.slice(0, -1));
+      const aiResponse = await this.getAIResponse(this.aiMessages.slice(0, -1));
       this.updateLastMessage(aiResponse);
-      const lastMsg = this.messages.at(-1);
+      const lastMsg = this.aiMessages.at(-1);
       if (lastMsg) {
         lastMsg.content = aiResponse ?? '';
-        this.messages = [...this.messages];
+        this.aiMessages = [...this.aiMessages];
       }
     } catch (error) {
-      const lastMsg = this.messages.at(-1);
+      const lastMsg = this.aiMessages.at(-1);
       if (lastMsg) {
         this.updateLastMessage(lastMsg.content);
       }
@@ -234,7 +234,7 @@ export class AppService {
       ?.store()
       .push([{ type: 'insert', data: { id: Date.now(), ...message } }]);
 
-    this.messages.push({ role: 'user', content: message?.text ?? '' });
+    this.aiMessages.push({ role: 'user', content: message?.text ?? '' });
 
     this.processMessageSending(setDisabled, event.event);
   }

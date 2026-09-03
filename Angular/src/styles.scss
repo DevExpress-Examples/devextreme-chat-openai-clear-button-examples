@@ -68,3 +68,11 @@ body, .demo-container {
     height: calc(100% - 24px);
     padding: 12px;
 }
+
+#ai-chat-popup-wrapper .dx-popup-content {
+    padding: 0;
+}
+
+#ai-chat-popup-wrapper #dx-ai-chat {
+    border: none;
+}

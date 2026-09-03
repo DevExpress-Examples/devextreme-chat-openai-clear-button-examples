@@ -22,6 +22,7 @@
     <div *dxTemplate="let data of 'popupTemplate'" style="height: 100%">
       <dx-chat
         #aiChat
+        id="dx-ai-chat"
         [class.chat-disabled]="isDisabled"
         [dataSource]="dataSource"
         [reloadOnChange]="false"

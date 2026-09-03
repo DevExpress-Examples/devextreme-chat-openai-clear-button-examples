@@ -68,6 +68,7 @@ export default function PopupExample(): JSX.Element {
 
   const renderPopup = useCallback(() => (
     <Chat
+      id='dx-ai-chat'
       ref={chatInstance}
       className={isDisabled ? CHAT_DISABLED_CLASS : ''}
       dataSource={appService.dataSource}
