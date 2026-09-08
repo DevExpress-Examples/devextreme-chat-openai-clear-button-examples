@@ -22,7 +22,13 @@ This example integrates DevExtreme Chat with [AzureOpenAI](https://developers.op
 
 <div align="center"><img src="images/popup.png" /></div>
 
-Obtain your own API key on the [Azure Portal](https://portal.azure.com/) and replace the placeholder to use our implementation.
+Obtain your own API key on the [Azure Portal](https://portal.azure.com/) and replace the placeholder to use our implementation:
+
+- **jQuery**: [`data.js#L1-L4`](/jQuery/src/data.js#L1-L4)
+- **Angular**: [`app.service.ts#L20-L24`](/Angular/src/app/app.service.ts#L20-L24)
+- **Vue**: [`chat.helpers.ts#L15-L19`](/Vue/src/helpers/chat.helpers.ts#L15-L19)
+- **React**: [`data.ts#L4-L8`](/React/src/data.ts#L4-L8)
+- **ASP.NET Core**: [`_Layout.cshtml#L61-L64`](/ASP.NET%20Core/Views/Shared/_Layout.cshtml#L61-L64)
 
 ## Files to Review
 
