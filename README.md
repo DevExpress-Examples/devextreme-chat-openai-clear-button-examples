@@ -4,11 +4,11 @@
 [![](https://img.shields.io/badge/📖_How_to_use_DevExpress_Examples-e9f6fc?style=flat-square)](https://docs.devexpress.com/GeneralInformation/403183)
 [![](https://img.shields.io/badge/💬_Leave_Feedback-feecdd?style=flat-square)](#does-this-example-address-your-development-requirementsobjectives)
 <!-- default badges end -->
-# DevExtreme Chat - AI Chat Clear Button Examples
+# DevExtreme Chat - Clear Button
 
 This repository contains code referenced in the following DevExtreme help topic: [Implement an AI Chat Clear Button](https://js.devexpress.com/Documentation/Guide/UI_Components/Chat/Implement_an_AI_Chat_Clear_Button/).
 
-This example integrates DevExtreme Chat with [AzureOpenAI](https://developers.openai.com/api/reference/typescript#microsoft-azure-openai) and configures **Clear Chat** buttons. These buttons clear old messages and allow you to start new AI conversations with fresh context windows. This example demonstrates three AI chat usage scenarios that you can integrate in your application:
+This example integrates DevExtreme Chat with [AzureOpenAI](https://developers.openai.com/api/reference/typescript#microsoft-azure-openai) and configure a **Clear Chat** button. This button clears old messages and allow you to start new AI conversations with fresh context windows. 
 
 - **Standalone AI chat**
 
@@ -22,7 +22,7 @@ This example integrates DevExtreme Chat with [AzureOpenAI](https://developers.op
 
 <div align="center"><img src="images/popup.png" /></div>
 
-Obtain your own API key on the [Azure Portal](https://portal.azure.com/) and replace the placeholder to integrate our implementation.
+Obtain your own API key on the [Azure Portal](https://portal.azure.com/) and replace the placeholder to use our implementation.
 
 ## Files to Review
 
