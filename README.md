@@ -8,7 +8,7 @@
 
 This repository contains code referenced in the following DevExtreme help topic: [Implement an AI Chat Clear Button](https://js.devexpress.com/Documentation/Guide/UI_Components/Chat/Implement_an_AI_Chat_Clear_Button/).
 
-This example integrates DevExtreme Chat with [AzureOpenAI](https://developers.openai.com/api/reference/typescript#microsoft-azure-openai) and configure a **Clear Chat** button. This button clears old messages and allow you to start new AI conversations with fresh context windows. 
+This example integrates DevExtreme Chat with [AzureOpenAI](https://developers.openai.com/api/reference/typescript#microsoft-azure-openai) and configures a **Clear Chat** button. This button clears old messages and allows you to start new AI conversations with fresh context windows. 
 
 - **Standalone AI chat**
 
