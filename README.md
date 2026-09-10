@@ -4,27 +4,57 @@
 [![](https://img.shields.io/badge/📖_How_to_use_DevExpress_Examples-e9f6fc?style=flat-square)](https://docs.devexpress.com/GeneralInformation/403183)
 [![](https://img.shields.io/badge/💬_Leave_Feedback-feecdd?style=flat-square)](#does-this-example-address-your-development-requirementsobjectives)
 <!-- default badges end -->
-# DevExtreme Chat - Integration with OpenAI
+# DevExtreme Chat - Clear Button
 
-This repository contains code referenced in the following DevExtreme help topic: [Integrate with AI Service - OpenAI](https://js.devexpress.com/Documentation/Guide/UI_Components/Chat/Integrate_with_AI_Service/#OpenAI).
+This repository contains code referenced in the following DevExtreme help topic: [Implement an AI Chat Clear Button](https://js.devexpress.com/Documentation/Guide/UI_Components/Chat/Implement_an_AI_Chat_Clear_Button/).
 
-This example integrates DevExtreme Chat with [OpenAI](https://platform.openai.com/docs/overview). Obtain your own [API key](https://platform.openai.com/api-keys) and replace the placeholder to integrate our implementation.
+This example integrates DevExtreme Chat with [AzureOpenAI](https://developers.openai.com/api/reference/typescript#microsoft-azure-openai) and configures a **Clear Chat** button. This button clears old messages and allows you to start new AI conversations with fresh context windows. 
 
-<div align="center"><img src="./images/chat-openai.png" /></div>
+- **Standalone AI chat**
+
+<div align="center"><img src="images/full-page.png" /></div>
+
+- **AI chat within a DevExtreme Drawer**
+
+<div align="center"><img src="images/drawer.png" /></div>
+
+- **AI chat within a DevExtreme Popup**
+
+<div align="center"><img src="images/popup.png" /></div>
+
+Obtain your own API key on the [Azure Portal](https://portal.azure.com/) and replace the placeholder to integrate our implementation:
+
+- **jQuery**: [`data.js#L1-L4`](/jQuery/src/data.js#L1-L4)
+- **Angular**: [`app.service.ts#L20-L24`](/Angular/src/app/app.service.ts#L20-L24)
+- **Vue**: [`chat.helpers.ts#L15-L19`](/Vue/src/helpers/chat.helpers.ts#L15-L19)
+- **React**: [`data.ts#L4-L8`](/React/src/data.ts#L4-L8)
+- **ASP.NET Core**: [`_Layout.cshtml#L61-L64`](/ASP.NET%20Core/Views/Shared/_Layout.cshtml#L61-L64)
 
 ## Files to Review
 
 - **jQuery**
-    - [index.js](jQuery/src/index.js)
+    - [full-page.js](jQuery/src/examples/full-page.js)
+    - [drawer.js](jQuery/src/examples/drawer.js)
+    - [popup.js](jQuery/src/examples/popup.js)
 - **Angular**
-    - [app.component.html](Angular/src/app/app.component.html)
-    - [app.component.ts](Angular/src/app/app.component.ts)
+    - [full-page.component.html](Angular/src/app/examples/full-page/full-page.component.html)
+    - [full-page.component.ts](Angular/src/app/examples/full-page/full-page.component.ts)
+    - [drawer.component.html](Angular/src/app/examples/drawer/drawer.component.html)
+    - [drawer.component.ts](Angular/src/app/examples/drawer/drawer.component.ts)
+    - [popup.component.html](Angular/src/app/examples/popup/popup.component.html)
+    - [popup.component.ts](Angular/src/app/examples/popup/popup.component.ts)
 - **Vue**
-    - [ChatInterface.vue](Vue/src/components/ChatInterface.vue)
+    - [full-page.vue](Vue/src/pages/Examples/full-page.vue)
+    - [drawer.vue](Vue/src/pages/Examples/drawer.vue)
+    - [popup.vue](Vue/src/pages/Examples/popup.vue)
 - **React**
-    - [ChatApp.tsx](React/src/components/ChatApp.tsx)
-- **NetCore**    
-    - [Index.cshtml](ASP.NET%20Core/Views/Home/Index.cshtml)
+    - [FullPage.tsx](React/src/pages/FullPage.tsx)
+    - [Drawer.tsx](React/src/pages/Drawer.tsx)
+    - [Popup.tsx](React/src/pages/Popup.tsx)
+- **ASP.NET Core**    
+    - [FullPage.cshtml](ASP.NET%20Core/Views/Examples/FullPage.cshtml)
+    - [Drawer.cshtml](ASP.NET%20Core/Views/Examples/Drawer.cshtml)
+    - [Popup.cshtml](ASP.NET%20Core/Views/Examples/Popup.cshtml)
 
 ## Documentation
 
