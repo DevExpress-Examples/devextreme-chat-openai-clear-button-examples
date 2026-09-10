@@ -22,7 +22,7 @@ This example integrates DevExtreme Chat with [AzureOpenAI](https://developers.op
 
 <div align="center"><img src="images/popup.png" /></div>
 
-Obtain your own API key on the [Azure Portal](https://portal.azure.com/) and replace the placeholder to use our implementation:
+Obtain your own API key on the [Azure Portal](https://portal.azure.com/) and replace the placeholder to integrate our implementation:
 
 - **jQuery**: [`data.js#L1-L4`](/jQuery/src/data.js#L1-L4)
 - **Angular**: [`app.service.ts#L20-L24`](/Angular/src/app/app.service.ts#L20-L24)
