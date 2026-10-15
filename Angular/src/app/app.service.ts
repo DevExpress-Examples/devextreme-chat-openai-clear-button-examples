@@ -39,6 +39,7 @@ export class AppService {
   chatMessages: Array<{ id: number; timestamp: Date; author: DxChatTypes.User; text: string }> = [];
   aiMessages: Array<{ role: "user" | "assistant" | "system"; content: string }> = [];
   alerts: DxChatTypes.Alert[] = [];
+  private alertTimeout: ReturnType<typeof setTimeout> | undefined;
 
   customStore: CustomStore | undefined;
 
@@ -132,11 +133,12 @@ export class AppService {
       temperature: 0.7,
     };
 
-    const signalObj = {
+    const requestOptions = {
       signal: this.controller.signal,
+      maxRetries: 0,
     };
 
-    const response = await this.chatService.chat.completions.create(params, signalObj);
+    const response = await this.chatService.chat.completions.create(params, requestOptions);
 
     const data = { choices: response.choices };
 
@@ -157,11 +159,11 @@ export class AppService {
         this.aiMessages.push({ role: "assistant", content: aiResponse ?? "" });
         this.renderAssistantMessage(aiResponse ?? "");
       }, 200);
-    } catch (error) {
+    } catch (error: unknown) {
       this.typingUsersSubject.next([]);
       
       if (!(error instanceof APIUserAbortError)) {
-        this.alertLimitReached();
+        this.alertError(this.getErrorMessage(error));
       }
     } finally {
       this.toggleDisabledState(false, e.event);
@@ -196,24 +198,42 @@ export class AppService {
     this.dataSource?.store().push([{ type: "insert", data: message }]);
   }
 
-  alertLimitReached() {
+  getErrorMessage(error: unknown): string {
+    if (error instanceof Error) return error.message;
+    if (typeof error === 'string') return error;
+    return 'Unknown error';
+  }
+
+  alertError(message: string) {
+    this.clearAlertTimeout();
     this.setAlerts([
       {
-        message: "Request limit reached, try again in a minute.",
+        message,
       },
     ]);
 
-    setTimeout(() => {
+    this.alertTimeout = setTimeout(() => {
+      this.alertTimeout = undefined;
       this.setAlerts([]);
     }, this.ALERT_TIMEOUT);
   }
 
+  private clearAlertTimeout(): void {
+    if (this.alertTimeout === undefined) return;
+
+    clearTimeout(this.alertTimeout);
+    this.alertTimeout = undefined;
+  }
+
   setAlerts(alerts: DxChatTypes.Alert[]) {
+    if (!alerts.length) this.clearAlertTimeout();
     this.alerts = alerts;
     this.alertsSubject.next(alerts);
   }
 
   async regenerate() {
+    this.setAlerts([]);
+
     try {
       const aiResponse = await this.getAIResponse(this.aiMessages.slice(0, -1));
 
@@ -223,13 +243,13 @@ export class AppService {
         lastMsg.content = aiResponse ?? '';
         this.aiMessages = [...this.aiMessages];
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const lastMsg = this.aiMessages.at(-1);
       if (lastMsg) {
         this.updateLastMessage(lastMsg.content);
       }
       if (!(error instanceof APIUserAbortError)) {
-        this.alertLimitReached();
+        this.alertError(this.getErrorMessage(error));
       }
     }
   }
@@ -246,6 +266,7 @@ export class AppService {
   }
 
   async onMessageEntered(event: DxChatTypes.MessageEnteredEvent) {
+    this.setAlerts([]);
     this.resetAbortController();
 
     const { message } = event;
@@ -263,6 +284,7 @@ export class AppService {
     this.chatMessages.length = 0;
     this.aiMessages.length = 0;
 
+    this.clearAlertTimeout();
     chatInstance.instance.option({ alerts: [], typingUsers: [] });
 
     chatInstance.instance.getDataSource().store().push(removals);

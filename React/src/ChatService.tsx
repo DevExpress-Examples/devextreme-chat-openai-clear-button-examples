@@ -15,6 +15,8 @@ export class AppService {
 
   alerts: ChatTypes.Alert[] = [];
 
+  private alertTimeout: ReturnType<typeof setTimeout> | undefined;
+
   customStore?: CustomStore;
 
   dataSource?: DataSource;
@@ -122,11 +124,12 @@ export class AppService {
       temperature: 0.7,
     };
 
-    const signalObj = {
+    const requestOptions = {
       signal: this.controller.signal,
+      maxRetries: 0,
     };
 
-    const response = await this.chatService.chat.completions.create(params, signalObj);
+    const response = await this.chatService.chat.completions.create(params, requestOptions);
     const data = { choices: response.choices };
     return data.choices[0].message?.content;
   }
@@ -146,12 +149,12 @@ export class AppService {
         this.aiMessages.push({ role: 'assistant', content: aiResponse ?? '' });
         this.renderAssistantMessage(aiResponse ?? '');
       }, 200);
-    } catch (error) {
+    } catch (error: unknown) {
       (event?.target as HTMLElement).focus();
       this.typingUsersSubject.next([]);
 
       if (!(error instanceof APIUserAbortError)) {
-        this.alertLimitReached();
+        this.alertError(this.getErrorMessage(error));
       }
     } finally {
       (event?.target as HTMLElement).focus();
@@ -188,24 +191,42 @@ export class AppService {
     this.dataSource?.store().push([{ type: 'insert', data: message }]);
   }
 
-  alertLimitReached(): void {
+  getErrorMessage(error: unknown): string {
+    if (error instanceof Error) return error.message;
+    if (typeof error === 'string') return error;
+    return 'Unknown error';
+  }
+
+  alertError(message: string): void {
+    this.clearAlertTimeout();
     this.setAlerts([
       {
-        message: 'Request limit reached, try again in a minute.',
+        message,
       },
     ]);
 
-    setTimeout((): void => {
+    this.alertTimeout = setTimeout((): void => {
+      this.alertTimeout = undefined;
       this.setAlerts([]);
     }, ALERT_TIMEOUT);
   }
 
+  private clearAlertTimeout(): void {
+    if (this.alertTimeout === undefined) return;
+
+    clearTimeout(this.alertTimeout);
+    this.alertTimeout = undefined;
+  }
+
   setAlerts(alerts: ChatTypes.Alert[]): void {
+    if (!alerts.length) this.clearAlertTimeout();
     this.alerts = alerts;
     this.alertsSubject.next(alerts);
   }
 
   async regenerate(): Promise<void> {
+    this.setAlerts([]);
+
     try {
       const aiResponse = await this.getAIResponse(this.aiMessages.slice(0, -1));
       this.updateLastMessage(aiResponse);
@@ -214,18 +235,19 @@ export class AppService {
         lastMsg.content = aiResponse ?? '';
         this.aiMessages = [...this.aiMessages];
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const lastMsg = this.aiMessages.at(-1);
       if (lastMsg) {
         this.updateLastMessage(lastMsg.content);
       }
       if (!(error instanceof APIUserAbortError)) {
-        this.alertLimitReached();
+        this.alertError(this.getErrorMessage(error));
       }
     }
   }
 
   onMessageEntered(event: ChatTypes.MessageEnteredEvent, setDisabled: (value: boolean) => void): void {
+    this.setAlerts([]);
     this.clearButtonOptions = { ...this.clearButtonOptions, disabled: false };
     this.resetAbortController();
 

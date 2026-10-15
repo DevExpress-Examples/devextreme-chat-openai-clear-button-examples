@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
+    "predev": "npm run prebuild",
     "prebuild": "devextreme-license --out src/devextreme-license.ts --force",
     "build": "run-p type-check build-only",
     "preview": "vite preview",

@@ -32,6 +32,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
   const chatMessages = ref<Array<DxChatTypes.Message>>([]);
   const aiMessages = ref<Array<{ role: 'user' | 'assistant' | 'system'; content: string }>>([]);
   const chatService = new AzureOpenAI(AzureOpenAIConfig);
+  let alertTimeout: ReturnType<typeof setTimeout> | undefined;
 
   const clearButtonOptions = ref<DxButtonTypes.Properties>({
     icon: 'clearhistory',
@@ -84,11 +85,12 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
       temperature: 0.7,
     };
 
-    const signalObj = {
+    const requestOptions = {
       signal: controller.signal,
+      maxRetries: 0,
     };
 
-    const response = await chatService.chat.completions.create(params, signalObj);
+    const response = await chatService.chat.completions.create(params, requestOptions);
     return response.choices[0].message?.content;
   };
 
@@ -106,11 +108,11 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
         aiMessages.value.push({ role: 'assistant', content: aiResponse ?? '' });
         renderAssistantMessage(aiResponse ?? '');
       }, 200);
-    } catch (error) {
+    } catch (error: unknown) {
       typingUsers.value = [];
 
       if (!(error instanceof APIUserAbortError)) {
-        alertLimitReached();
+        alertError(getErrorMessage(error));
       }
     } finally {
       toggleDisabledState(false, e.event);
@@ -144,16 +146,36 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
     dataSource.value?.store().push([{ type: 'insert', data: message }]);
   };
 
-  const alertLimitReached = () => {
-    setAlerts([{ message: 'Request limit reached, try again in a minute.' }]);
-    setTimeout(() => setAlerts([]), ALERT_TIMEOUT);
+  const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) return error.message;
+    if (typeof error === 'string') return error;
+    return 'Unknown error';
+  };
+
+  const alertError = (message: string) => {
+    clearAlertTimeout();
+    setAlerts([{ message }]);
+    alertTimeout = setTimeout(() => {
+      alertTimeout = undefined;
+      setAlerts([]);
+    }, ALERT_TIMEOUT);
+  };
+
+  const clearAlertTimeout = () => {
+    if (alertTimeout === undefined) return;
+
+    clearTimeout(alertTimeout);
+    alertTimeout = undefined;
   };
 
   const setAlerts = (newAlerts: Array<DxChatTypes.Alert>) => {
+    if (!newAlerts.length) clearAlertTimeout();
     alerts.value = newAlerts;
   };
 
   const regenerate = async() => {
+    setAlerts([]);
+
     try {
       const aiResponse = await getAIResponse(aiMessages.value.slice(0, -1));
       updateLastMessage(aiResponse);
@@ -162,10 +184,10 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
         lastMsg.content = aiResponse ?? '';
         aiMessages.value = [...aiMessages.value];
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const lastMsg = aiMessages.value.at(-1);
       if (lastMsg) updateLastMessage(lastMsg.content);
-      if (!(error instanceof APIUserAbortError)) alertLimitReached();
+      if (!(error instanceof APIUserAbortError)) alertError(getErrorMessage(error));
     }
   };
 
@@ -192,6 +214,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
   };
 
   const onMessageEntered = async(e: DxChatTypes.MessageEnteredEvent) => {
+    setAlerts([]);
     clearButtonOptions.value = { ...clearButtonOptions.value, disabled: false };
     resetAbortController();
 
@@ -230,6 +253,7 @@ export function useChatLogic(chatInstance: Ref<{ instance: dxChat } | null>) {
     chatMessages.value.length = 0;
     aiMessages.value.length = 0;
 
+    clearAlertTimeout();
     widget.option({ alerts: [], typingUsers: [] });
 
     widget.getDataSource().store().push(removals);
