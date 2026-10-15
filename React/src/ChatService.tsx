@@ -14,6 +14,7 @@ export class AppService {
   aiMessages: { role: 'user' | 'assistant' | 'system'; content: string }[] = [];
 
   alerts: ChatTypes.Alert[] = [];
+
   private alertTimeout: ReturnType<typeof setTimeout> | undefined;
 
   customStore?: CustomStore;
