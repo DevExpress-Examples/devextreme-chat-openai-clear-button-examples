@@ -23,15 +23,29 @@ $(() => {
 })
 
 let controller = new AbortController();
+let alertTimeout;
 
-function alertLimitReached(chatInstance) {
+function clearAlertTimeout() {
+  clearTimeout(alertTimeout);
+  alertTimeout = undefined;
+}
+
+function getErrorMessage(error) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Unknown error';
+}
+
+function alertError(chatInstance, message) {
+  clearAlertTimeout();
   chatInstance.option({
     alerts: [{
-      message: 'Request limit reached, try again in a minute.',
+      message,
     }],
   });
 
-  setTimeout(() => {
+  alertTimeout = setTimeout(() => {
+    alertTimeout = undefined;
     chatInstance.option({ alerts: [] });
   }, 10000);
 }
@@ -60,7 +74,7 @@ export async function processMessageSending(chatInstance, messages, customStore,
     chatInstance.option({ typingUsers: [] });
 
     if (!(error instanceof APIUserAbortError)) {
-      alertLimitReached(chatInstance);
+      alertError(chatInstance, getErrorMessage(error));
     }
   } finally {
     toggleDisabledState(false, chatInstance);
@@ -78,6 +92,8 @@ function renderMessage(text, customStore) {
 }
 export async function regenerate(chatInstance, messages, customStore, chatService) {
   toggleDisabledState(true, chatInstance);
+  clearAlertTimeout();
+  chatInstance.option({ alerts: [] });
 
   try {
     const aiResponse = await getAIResponse(messages.slice(0, -1), chatService);
@@ -90,7 +106,7 @@ export async function regenerate(chatInstance, messages, customStore, chatServic
       updateLastMessage(lastMessage.content, chatInstance, customStore);
     }
     if (!(error instanceof APIUserAbortError)) {
-      alertLimitReached(chatInstance);
+      alertError(chatInstance, getErrorMessage(error));
     }
   } finally {
     toggleDisabledState(false, chatInstance);
@@ -118,11 +134,12 @@ async function getAIResponse(messagesAI, chatService) {
     temperature: 0.7,
   };
 
-  const signalObj = {
+  const requestOptions = {
     signal: controller.signal,
+    maxRetries: 0,
   };
 
-  const response = await chatService.chat.completions.create(params, signalObj);
+  const response = await chatService.chat.completions.create(params, requestOptions);
 
   return response.choices[0]?.message?.content;
 }
@@ -175,6 +192,8 @@ export const customStore = new DevExpress.data.CustomStore({
 export function onMessageEntered (e) {
   $(`#${clearButtonId}`).dxButton('instance').option('disabled', false);
   resetAbortController();
+  clearAlertTimeout();
+  e.component.option({ alerts: [] });
 
   const { message } = e;
 
@@ -236,6 +255,7 @@ export function clearChat(chatInstance) {
   chatMessages.length = 0;
   aiMessages.length = 0;
 
+  clearAlertTimeout();
   chatInstance.option({ alerts: [], typingUsers: [] });
 
   chatInstance.getDataSource().store().push(removals);
